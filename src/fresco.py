@@ -20,7 +20,7 @@ import json
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageFilter, ImageOps
+from PIL import Image, ImageDraw, ImageFilter, ImageOps
 from scipy import ndimage
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -30,8 +30,20 @@ EDGE_PCT = 90              # the strongest light-to-dark steps inside the hand (
 CELL_ASPECT = 2.0          # a character cell is about twice as tall as it is wide
 BINS = 8                   # colour bins for tinting
 FADE = 0.05               # share of the width over which the arms fade out
-FLOOR = 2                 # lowest ramp step for skin inside the outline (",")
+FLOOR = 5                 # lowest ramp step for skin inside the outline ("-"); the colour carries the shadow
+SEAM_FLOOR = 5            # cells beside a cut seam start at "-", so shaded fingers stay solid
 DARK = 0.12               # how much darkness counts toward being skin (the shaded underside of a forearm)
+PLASTER = 0.21            # below this unblurred skin score (and not dark), a pixel inside the hand is plaster
+SEAM_W = 6                # width of a traced seam, in pixels per 1,200 px of rendering width
+# Adam's fingers overlap in shadow, so the seams between them are traced by hand on
+# the fresco (as fractions of the full image) and cut as narrow gaps
+SEAMS = {
+    "index over middle": [(0.3525, 0.4366), (0.3583, 0.4373), (0.3648, 0.44), (0.3669, 0.4467), (0.3696, 0.4531), (0.3725, 0.4586), (0.375, 0.4609)],
+    "middle and ring": [(0.3617, 0.4481), (0.3638, 0.4564), (0.3652, 0.4655), (0.3665, 0.4747), (0.367, 0.4802)],
+    "ring and lower finger": [(0.3529, 0.4435), (0.3546, 0.4472), (0.3563, 0.4508), (0.3577, 0.4564), (0.3588, 0.4637), (0.3596, 0.471), (0.36, 0.4793)],
+    "lower finger and the tip behind it": [(0.3533, 0.4683), (0.353, 0.4733), (0.3528, 0.4793)],
+}
+PALE_GAP = [(0.3456, 0.4412), (0.3488, 0.4435), (0.3513, 0.4481), (0.351, 0.4529), (0.3488, 0.4513), (0.3467, 0.4463)]   # plaster seen between the lower finger and the shaded fingers
 GAP = (0.3792, 0.4538)     # the point between the two fingertips, as fractions of the fresco
 WIDE = (0.293, 0.365, 0.472, 0.528)   # both hands, with a short stretch of each forearm
 NARROW = (0.345, 0.385, 0.44, 0.52)   # phones: the fingertips about to touch
@@ -126,6 +138,29 @@ def convert(path, crop, cols, sat_cut, gamma, contours=True, local=0.8):
     lab, n = ndimage.label(mask)
     sizes = ndimage.sum(mask, lab, range(1, n + 1))
     mask = np.isin(lab, [i + 1 for i, z in enumerate(sizes) if z > 0.01 * mask.size])
+
+    # open the gaps between Adam's fingers: slivers of plaster that the blur merged
+    # into the hand, plus the traced seams where the fingers overlap in shadow
+    raw = ndimage.gaussian_filter(np.maximum(s, s + DARK * (0.86 - v)), 0.6)
+    adam_side = np.zeros_like(mask)
+    adam_side[:, :int((GAP[0] - x0) / (x1 - x0) * mask.shape[1])] = True
+    plaster = (raw < PLASTER) & (v > 0.6) & mask & adam_side
+    gl, gn = ndimage.label(plaster)
+    gs = ndimage.sum(plaster, gl, range(1, gn + 1))
+    gap = np.isin(gl, [i + 1 for i, z in enumerate(gs) if z > 150])
+    px = lambda p: ((p[0] - x0) / (x1 - x0) * mask.shape[1], (p[1] - y0) / (y1 - y0) * mask.shape[0])
+    cut = Image.new("L", (mask.shape[1], mask.shape[0]), 0)
+    dc = ImageDraw.Draw(cut)
+    width = max(3, round(SEAM_W * mask.shape[1] / 1200))
+    for line in SEAMS.values():
+        dc.line([px(p) for p in line], fill=255, width=width, joint="curve")
+    dc.polygon([px(p) for p in PALE_GAP], fill=255)
+    gap |= np.asarray(cut) > 0
+    whole = ndimage.gaussian_filter(mask.astype(float), 1.2)      # the hand before the seams are cut
+    mask &= ~gap
+    lab, n = ndimage.label(mask)
+    sizes = ndimage.sum(mask, lab, range(1, n + 1))
+    mask = np.isin(lab, [i + 1 for i, z in enumerate(sizes) if z > 0.0015 * mask.size])
     soft = ndimage.gaussian_filter(mask.astype(float), 1.2)
 
     # tone: luminance stretched over the skin only, then local contrast so the
@@ -145,6 +180,7 @@ def convert(path, crop, cols, sat_cut, gamma, contours=True, local=0.8):
     cell = lambda a: a.reshape(rows, 8, cols, 4).mean(axis=(1, 3))
     t = cell(tone * soft) / np.maximum(cell(soft), 1e-6)
     cov = cell(soft)
+    beside_seam = cell(whole * fade[None, :]) >= 0.8               # inside the hand, next to a cut seam
     rng = np.random.default_rng(7)
     grain = rng.random(cov.shape)
     fading = cell(np.broadcast_to(fade[None, :], soft.shape)) < 0.999   # only the arm ends dissolve
@@ -193,7 +229,10 @@ def convert(path, crop, cols, sat_cut, gamma, contours=True, local=0.8):
             if drop:
                 row.append(" "), tint.append(-1)
                 continue
-            if contours and not fading[i, j] and cov[i, j] < 0.8:
+            if contours and not fading[i, j] and cov[i, j] < 0.8 and beside_seam[i, j]:
+                # the edge of a seam stays solid, so the seam reads as one clean channel
+                ch = RAMP[max(1, min(top, int(SEAM_FLOOR + t[i, j] * (top - SEAM_FLOOR) + 0.5)))]
+            elif contours and not fading[i, j] and cov[i, j] < 0.8:
                 ch = outline(m_ang[i, j], m_gx[i, j], m_gy[i, j])
             elif contours and inside[i, j] and l_str[i, j] > seam and t[i, j] < 0.5:
                 # the deepest step, on its dark side, is left open: a shadow seam
