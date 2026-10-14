@@ -38,7 +38,8 @@ python src/build.py
 
 - Type: Schibsted Grotesk for prose, Martian Mono for labels and ASCII figures, Doto (dot matrix) only for metric readouts.
 - Lettering: FIGlet Roman on desktop, Small Slant on phones. The name resolves out of noise on load and stays still when reduced motion is on.
-- Every ASCII figure carries real content: the error Whisper corrects away, the leaderboard history, each project's pipeline and the timeline.
+- Dark slate with three muted accents that carry meaning: sand for emphasis, sage for what was chosen or shipped, rose for what was tested and dropped.
+- Every ASCII figure carries real content: the error Whisper corrects away, five measured retrieval setups and each project's pipeline.
 - House style: no em dashes, no en dashes, no emoji. The source is plain 7-bit ASCII.
 
 ## Publishing
