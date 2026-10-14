@@ -34,6 +34,7 @@ FLOOR = 5                 # lowest ramp step for skin inside the outline ("-"); 
 SEAM_FLOOR = 5            # cells beside a cut seam start at "-", so shaded fingers stay solid
 DARK = 0.12               # how much darkness counts toward being skin (the shaded underside of a forearm)
 PLASTER = 0.21            # below this unblurred skin score (and not dark), a pixel inside the hand is plaster
+SEAM_WIDE = {"index over middle"}   # seams cut twice as wide, with only light characters beside them
 SEAM_W = 6                # width of a traced seam, in pixels per 1,200 px of rendering width
 # Adam's fingers overlap in shadow, so the seams between them are traced by hand on
 # the fresco (as fractions of the full image) and cut as narrow gaps
@@ -152,11 +153,18 @@ def convert(path, crop, cols, sat_cut, gamma, contours=True, local=0.8):
     cut = Image.new("L", (mask.shape[1], mask.shape[0]), 0)
     dc = ImageDraw.Draw(cut)
     width = max(3, round(SEAM_W * mask.shape[1] / 1200))
-    for line in SEAMS.values():
-        dc.line([px(p) for p in line], fill=255, width=width, joint="curve")
+    for name, line in SEAMS.items():
+        wide_seam = name in SEAM_WIDE
+        dc.line([px(p) for p in line], fill=255, width=width * (2 if wide_seam else 1), joint="curve")
+    # cells near a wide seam are capped at light characters, so no @ # % bridge it
+    calm = Image.new("L", (mask.shape[1], mask.shape[0]), 0)
+    dk = ImageDraw.Draw(calm)
+    for name in SEAM_WIDE:
+        dk.line([px(p) for p in SEAMS[name]], fill=255, width=width * 3, joint="curve")
     dc.polygon([px(p) for p in PALE_GAP], fill=255)
     gap |= np.asarray(cut) > 0
     whole = ndimage.gaussian_filter(mask.astype(float), 1.2)      # the hand before the seams are cut
+    calm = np.asarray(calm) > 0
     mask &= ~gap
     lab, n = ndimage.label(mask)
     sizes = ndimage.sum(mask, lab, range(1, n + 1))
@@ -181,6 +189,7 @@ def convert(path, crop, cols, sat_cut, gamma, contours=True, local=0.8):
     t = cell(tone * soft) / np.maximum(cell(soft), 1e-6)
     cov = cell(soft)
     beside_seam = cell(whole * fade[None, :]) >= 0.8               # inside the hand, next to a cut seam
+    near_calm = cell(calm.astype(float)) > 0.05
     rng = np.random.default_rng(7)
     grain = rng.random(cov.shape)
     fading = cell(np.broadcast_to(fade[None, :], soft.shape)) < 0.999   # only the arm ends dissolve
@@ -246,6 +255,8 @@ def convert(path, crop, cols, sat_cut, gamma, contours=True, local=0.8):
                 ch = RAMP[max(1, int(t[i, j] * min(1.0, cov[i, j]) ** 1.5 * top + 0.5))]
             else:
                 ch = RAMP[max(1, min(top, int(FLOOR + t[i, j] * (top - FLOOR) + 0.5)))]
+            if near_calm[i, j] and ch in "@#%":
+                ch = "+"
             row.append(ch)
             # colour follows the light: 0 = deep ochre shadow ... BINS-1 = plaster highlight
             tint.append(int(min(BINS - 1, max(0, t[i, j] * BINS))))
