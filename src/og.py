@@ -1,0 +1,38 @@
+"""Write src/og.html, the 1200 x 627 link preview card. Screenshot it to og.png.
+
+Usage: python src/og.py, then open src/og.html at 1200 x 627 and save a screenshot as og.png.
+"""
+import html
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+hands = json.loads((ROOT / "src" / "hands.json").read_text())["wide"]
+art = html.escape("\n".join(hands["lines"]), quote=False)
+
+page = f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Link preview card</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,400;1,500&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+html, body {{ margin: 0; }}
+body {{ width: 1200px; height: 627px; box-sizing: border-box; padding: 44px 64px 40px; background: #0B0B0B; color: #ECE8E1;
+  display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; font-family: "Geist Mono", monospace; }}
+.top {{ display: flex; justify-content: space-between; align-items: baseline; }}
+.name {{ font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 92px; line-height: .9; letter-spacing: -.02em; margin: 0; }}
+.name i {{ font-weight: 400; color: #ABA59C; }}
+.tag {{ font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: #ABA59C; }}
+.tag span {{ color: #D4B06E; }}
+pre {{ margin: 0; font-family: "Geist Mono", monospace; font-size: 11.6px; line-height: 1.2; color: #ECE8E1; }}
+.bottom {{ display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid #242322; padding-top: 18px; }}
+.lead {{ font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 32px; margin: 0; }}
+.lead em {{ color: #D4B06E; }}
+.fig {{ font-size: 13px; color: #8A847B; }}
+</style></head><body>
+<div class="top"><p class="name">Aryan <i>Awasthi</i></p><p class="tag">ML <span>/</span> AI <span>/</span> Data science</p></div>
+<pre>{art}</pre>
+<div class="bottom"><p class="lead">I try every reasonable answer, then <em>prove</em> which one is better.</p><p class="fig">after Michelangelo, in ASCII</p></div>
+</body></html>
+"""
+(ROOT / "src" / "og.html").write_text(page, encoding="utf-8")
+print("wrote src/og.html")

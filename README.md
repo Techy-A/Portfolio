@@ -19,28 +19,37 @@ A single static page with no framework and no build step at runtime.
 | Path | What it is |
 |:--|:--|
 | `index.html` | The site. Open it in a browser, or serve the repo root with GitHub Pages. |
-| `src/index.template.html` | Source for `index.html`, with placeholders for the ASCII name lettering. |
-| `src/build.py` | Renders the FIGlet lettering into the template and writes `index.html`. |
+| `src/index.template.html` | Source for `index.html`, with placeholders for the ASCII hands. |
+| `src/hands.py` | Models the two hands from The Creation of Adam and draws them as ASCII line art. Writes `src/hands.json`. |
+| `src/build.py` | Puts the hands and the spark into the template and writes `index.html`. |
+| `src/og.py`, `src/og.html` | Source for `og.png`, the 1200 x 627 link preview. Screenshot `og.html` at that size to regenerate. |
+| `llms.txt` | Plain-text summary of the page for AI assistants. |
 | `AryanAwasthi.pdf` | Resume, linked from the page. |
-| `og.png` | 1200 x 627 link preview for LinkedIn and other sites. |
-| `src/og.html` | Source for `og.png`. Screenshot it at 1200 x 627 to regenerate. |
 
 ## Editing
 
 Change copy and styles in `src/index.template.html`, then rebuild:
 
 ```bash
-pip install pyfiglet
 python src/build.py
+```
+
+To redraw the hands (only needed if the drawing changes):
+
+```bash
+pip install numpy scipy pillow
+python src/hands.py && python src/og.py && python src/build.py
 ```
 
 ## Design notes
 
-- Type: Schibsted Grotesk for prose, Martian Mono for labels and ASCII figures, Doto (dot matrix) only for metric readouts.
-- Lettering: FIGlet Roman on desktop, Small Slant on phones. The name resolves out of noise on load and stays still when reduced motion is on.
-- Dark slate with three muted accents that carry meaning: sand for emphasis, sage for what was chosen or shipped, rose for what was tested and dropped.
-- Every ASCII figure carries real content: the error Whisper corrects away, five measured retrieval setups and each project's pipeline.
-- House style: no em dashes, no en dashes, no emoji. The source is plain 7-bit ASCII.
+- Matte black with a fine grain. Three muted accents carry meaning: ochre for emphasis and the spark, sage for what was chosen or shipped, rose for what was tested and dropped.
+- Human and machine: Cormorant Garamond (a Renaissance face) for display, Geist for text, Geist Mono for labels and ASCII, Doto (dot matrix) only for metric readouts.
+- The hands are modelled as tubes and palms, outlined front to back so fingers hide what is behind them, and every character cell is matched to the closest ASCII glyph. Nothing is traced from the fresco.
+- On load the hands are denoised from random characters in 40 steps, like a diffusion sampler. "Sample again" reruns it. Reduced motion shows the finished drawing.
+- Ctrl K, Cmd K or / opens a jump menu: sections, resume, copy email, GitHub, LinkedIn.
+- The first screen holds what a recruiter scans for: name, headline, resume button and a model card (role sought, latest role and dates, education, location, stack, contact).
+- House style: no em dashes, no en dashes, no emoji. Every file is plain 7-bit ASCII.
 
 ## Publishing
 

@@ -1,0 +1,24 @@
+# Aryan Awasthi
+
+> Machine learning and data student at Thapar Institute of Engineering and Technology (B.E. Electronics and Computer Engineering, 2023 to 2027). Tries every reasonable answer, then proves which one is better. Open to ML, data and analytics internships and new-grad roles. Based in New Delhi, India.
+
+Contact: aryanawasthi017@gmail.com
+GitHub: https://github.com/Techy-A
+LinkedIn: https://www.linkedin.com/in/aryan--awasthi
+Resume: AryanAwasthi.pdf
+
+## Experience
+
+- AI Research Intern, Data and Model Evaluation, Appy Pie (Pixazo), Noida, June to July 2026. Built a statistical evaluation system (Elo, Bradley-Terry MLE, bootstrap confidence intervals) over 1,050 match-ups across 15 models; it caught three broken scoring signals and a leaderboard discrepancy before launch. Shipped a 22-panel React cost dashboard with an Elo-per-dollar ranking and a quality-versus-cost Pareto frontier. Audited a 73-model catalog and probed 6+ production model endpoints.
+
+## Projects
+
+- [CollegeBot](https://github.com/Techy-A/collegebot-rag): grounded RAG assistant with cited answers and explicit refusals. Hybrid dense and BM25 retrieval raised facts reaching the context from 77.1% to 88.6%, matching a cross-encoder reranker with no added latency. 64 offline tests.
+- [Spoken grammar scoring](https://github.com/Techy-A/shl-grammar-scoring): predicts a 0 to 5 grammar score from spontaneous speech using verbatim Whisper transcripts, frozen speech encoders and an audio language model. Out-of-fold Pearson r of 0.909 on speaker-grouped folds.
+- [Text-to-image evaluation arena](https://github.com/Techy-A/IMAGE-LLP-VISION): round-robin tournaments within prompt groups, five scorers, Elo and Bradley-Terry MLE rankings, runs locally.
+- [Audio LLM grammar scorer](https://github.com/Techy-A/LORA_for_GPU): QLoRA fine-tuning of Voxtral-Mini-3B on an 8 GB GPU with speaker-grouped 5-fold cross-validation.
+- [Self-pruning neural network](https://github.com/Techy-A/Self-Pruning-Neural-Network---Tredence-Analytics): CIFAR-10 network whose classifier head prunes itself with L1-penalised sigmoid gates.
+
+## Skills
+
+Python, PyTorch, scikit-learn, XGBoost, Hugging Face, LangChain, RAG, QLoRA and PEFT, SQL, PostgreSQL, BigQuery, Power BI, pandas, statistics (Elo and Bradley-Terry ratings, hypothesis testing, bootstrap confidence intervals), React, FastAPI, Streamlit, Docker.
