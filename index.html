@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aryan Awasthi</title>
+<meta name="description" content="Aryan Awasthi builds machine learning models and the measurements that tell you whether they work. Speech ML, RAG, model evaluation.">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@600;900&family=Martian+Mono:wght@300;400;500&family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2313202B'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='18' font-weight='700' text-anchor='middle' fill='%23F2A33B'%3EA%3C/text%3E%3C/svg%3E">
+<style>
+:root {
+  --paper: #E8ECEF;
+  --paper-2: #DDE3E8;
+  --ink: #13202B;
+  --ink-2: #4A5A68;
+  --ink-3: #56636F;
+  --rule: #C3CCD3;
+  --signal: #D18A1F;
+  --signal-ink: #8F5400;
+  --link: #13202B;
+  --mono: "Martian Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --sans: "Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --dot: "Doto", var(--mono);
+  --gutter: 16px;
+  --rail: 196px;
+  --max: 1180px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0F171E;
+    --paper-2: #16212A;
+    --ink: #DCE3E8;
+    --ink-2: #9AA9B5;
+    --ink-3: #7D8D99;
+    --rule: #27343F;
+    --signal: #F2A33B;
+    --signal-ink: #F2A33B;
+    --link: #DCE3E8;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0F171E;
+  --paper-2: #16212A;
+  --ink: #DCE3E8;
+  --ink-2: #9AA9B5;
+  --ink-3: #7D8D99;
+  --rule: #27343F;
+  --signal: #F2A33B;
+  --signal-ink: #F2A33B;
+  --link: #DCE3E8;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.6;
+    overflow-x: hidden;
+}
+a { color: var(--link); text-decoration-color: var(--signal); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+a:hover { color: var(--signal-ink); }
+:focus-visible { outline: 2px solid var(--signal-ink); outline-offset: 3px; border-radius: 2px; }
+::selection { background: var(--signal); color: #13202B; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.wrap { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
+@media (min-width: 720px) { :root { --gutter: 40px; } }
+
+pre, .mono { font-family: var(--mono); }
+pre { margin: 0; font-size: 13px; line-height: 1.35; white-space: pre; }
+.fit { overflow: hidden; }
+.plate .fit, .pipe.fit { overflow-x: auto; }
+.fit pre { display: inline-block; }
+
+/* top bar */
+.bar {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  padding-top: 22px; padding-bottom: 22px;
+  font-family: var(--mono); font-size: 12px; letter-spacing: .02em;
+}
+.bar .who { color: var(--ink); text-decoration: none; font-weight: 500; }
+.bar nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px 20px; }
+.bar nav a { color: var(--ink-2); text-decoration: none; }
+.bar nav a:hover { color: var(--ink); }
+.bar nav a::before { content: "/" / ""; color: var(--ink-3); margin-right: 6px; }
+@media (max-width: 560px) { .bar nav .opt { display: none; } }
+
+/* hero */
+.hero { padding-top: 7vh; padding-bottom: 72px; }
+.hero .name { color: var(--ink); margin-bottom: 40px; }
+.hero .name pre { line-height: 1.12; }
+.hero .name .wide { display: block; }
+.hero .name .narrow { display: none; }
+@media (max-width: 640px) {
+  .hero .name .wide { display: none; }
+  .hero .name .narrow { display: block; }
+}
+.hero .name .gap { height: .9em; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
+@media (min-width: 900px) { .hero-grid { grid-template-columns: var(--rail) minmax(0, 1fr); gap: 0; } }
+.kicker { font-family: var(--mono); font-size: 12px; color: var(--ink-2); line-height: 1.7; padding-right: 24px; }
+.kicker b { color: var(--ink); font-weight: 500; display: block; text-transform: uppercase; letter-spacing: .08em; }
+.lead {
+  font-size: clamp(28px, 4.2vw, 50px); line-height: 1.08; letter-spacing: -.025em;
+  font-weight: 600; margin: 0 0 24px; max-width: 18ch; text-wrap: balance;
+}
+.lead em { font-style: normal; color: var(--signal-ink); }
+.sub { max-width: 60ch; color: var(--ink-2); margin: 0 0 32px; }
+.sub strong { color: var(--ink); font-weight: 600; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: center; }
+.btn {
+  font-family: var(--mono); font-size: 13px; text-decoration: none;
+  padding: 11px 16px; border: 1px solid var(--ink); color: var(--ink); border-radius: 2px;
+  transition: background .15s, color .15s;
+}
+.btn:hover { background: var(--ink); color: var(--paper); }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.primary:hover { background: transparent; color: var(--ink); }
+.actions .tl { font-family: var(--mono); font-size: 13px; margin-left: 8px; }
+.status { font-family: var(--mono); font-size: 12px; color: var(--ink-2); margin-top: 22px; }
+.status::before { content: "[*]" / ""; color: var(--signal-ink); margin-right: 8px; }
+
+/* sections */
+.sec { border-top: 1px solid var(--rule); padding-top: 40px; padding-bottom: 88px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+@media (min-width: 900px) { .sec { grid-template-columns: var(--rail) minmax(0, 1fr); gap: 0; } }
+.rail { font-family: var(--mono); font-size: 12px; line-height: 1.7; padding-right: 24px; }
+.rail .k { color: var(--ink); font-weight: 500; text-transform: uppercase; letter-spacing: .08em; margin: 0; }
+.rail .v { color: var(--ink-3); margin: 0; }
+@media (min-width: 900px) { .rail { position: sticky; top: 24px; align-self: start; } }
+.sec h2 {
+  font-size: clamp(26px, 3.2vw, 38px); line-height: 1.12; letter-spacing: -.02em;
+  font-weight: 600; margin: 0 0 18px; max-width: 24ch; text-wrap: balance;
+}
+.sec h3 { font-size: 20px; letter-spacing: -.01em; font-weight: 600; margin: 0; line-height: 1.3; }
+.prose { max-width: 64ch; color: var(--ink-2); }
+.prose p { margin: 0 0 16px; }
+.prose strong { color: var(--ink); font-weight: 600; }
+
+/* readouts: the only place Doto appears */
+.readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; margin: 36px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.readout div { padding: 18px 18px 16px 0; }
+.readout div + div { padding-left: 18px; border-left: 1px solid var(--rule); }
+@media (max-width: 520px) {
+  .readout div:nth-child(odd) { padding-left: 0; border-left: 0; }
+  .readout div:nth-child(n+3) { border-top: 1px solid var(--rule); }
+}
+.readout .n { font-variant-numeric: tabular-nums; font-family: var(--dot); font-weight: 900; font-size: clamp(34px, 4.6vw, 52px); line-height: 1; letter-spacing: .01em; color: var(--ink); display: block; }
+.readout .n i { font-family: var(--mono); font-style: normal; font-weight: 500; font-size: .5em; margin: 0 .08em; }
+.readout .n small { font-size: .5em; font-weight: 600; color: var(--ink-2); margin-left: 2px; }
+.readout .l { font-family: var(--mono); font-size: 11px; color: var(--ink-2); display: block; margin-top: 10px; line-height: 1.5; }
+
+/* figures */
+figure { margin: 40px 0; }
+.plate { background: var(--paper-2); border: 1px solid var(--rule); padding: 22px 22px 18px; border-radius: 2px; }
+@media (max-width: 520px) { .plate { padding: 16px 12px 14px; } }
+figcaption { font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-top: 12px; line-height: 1.6; }
+figcaption b { color: var(--ink-2); font-weight: 500; }
+.hl { color: var(--signal-ink); font-weight: 500; }
+.dim { color: var(--ink-3); }
+.strike { text-decoration: line-through; text-decoration-color: var(--signal); }
+
+.diff { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; font-family: var(--mono); font-size: 13px; margin-top: 18px; }
+.diff dt { color: var(--ink-3); }
+.diff dd { margin: 0; color: var(--ink); }
+
+.lessons { display: grid; gap: 28px; margin-top: 8px; }
+@media (min-width: 760px) { .lessons { grid-template-columns: repeat(3, 1fr); gap: 32px; } }
+.lessons h3 { font-size: 17px; margin-bottom: 8px; }
+.lessons p { margin: 0; color: var(--ink-2); font-size: 15px; }
+.lessons .tag { font-family: var(--mono); font-size: 11px; color: var(--signal-ink); display: block; margin-bottom: 8px; }
+
+/* experience */
+.role-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 24px; align-items: baseline; margin-bottom: 4px; }
+.role-head .when { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+.role-org { color: var(--ink-2); margin: 0 0 8px; }
+.ledger { list-style: none; padding: 0; margin: 28px 0 0; border-top: 1px solid var(--rule); }
+.ledger li:last-child, .edu li:last-child { border-bottom: 0; }
+.ledger li { display: grid; gap: 4px 28px; padding: 16px 0; border-bottom: 1px solid var(--rule); }
+@media (min-width: 760px) { .ledger li { grid-template-columns: 170px 1fr; } }
+.ledger .what { font-family: var(--mono); font-size: 12px; color: var(--ink); padding-top: 3px; }
+.ledger p { margin: 0; color: var(--ink-2); max-width: 68ch; }
+.ledger strong { color: var(--ink); font-weight: 600; }
+
+/* projects */
+.projects { list-style: none; padding: 0; margin: 0; }
+.proj { padding: 32px 0; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.proj:first-child { padding-top: 8px; }
+@media (min-width: 1000px) { .proj { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 40px; align-items: start; } }
+.proj h3 a { color: var(--ink); text-decoration: none; }
+.proj h3 a:hover { text-decoration: underline; }
+.proj h3 .ext { white-space: nowrap; font-family: var(--mono); font-size: 12px; color: var(--ink-3); font-weight: 400; margin-left: 6px; }
+.proj p { margin: 6px 0 0; color: var(--ink-2); font-size: 16px; }
+.proj .fact { font-family: var(--mono); font-size: 12px; color: var(--signal-ink); margin-top: 10px; }
+.proj .pipe { background: var(--paper-2); border: 1px solid var(--rule); padding: 14px 16px; border-radius: 2px; }
+.proj .pipe pre { font-size: 12px; color: var(--ink-2); }
+.proj .pipe pre b { color: var(--ink); font-weight: 500; }
+.more { margin-top: 32px; font-size: 15px; color: var(--ink-2); }
+.more ul { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
+.more li::before { content: "+" / ""; font-family: var(--mono); color: var(--ink-3); margin-right: 10px; }
+
+/* journey */
+.journey { list-style: none; padding: 0; margin: 0; font-family: var(--mono); font-size: 13px; }
+.journey li { display: grid; grid-template-columns: 5ch 7ch 1fr; align-items: baseline; }
+.journey .y { color: var(--ink); font-weight: 500; }
+.journey .t { color: var(--ink-3); white-space: pre; }
+.journey .e { color: var(--ink-2); font-family: var(--sans); font-size: 16px; padding: 3px 0; }
+.journey li.now .e { color: var(--ink); }
+.journey li.now .t { color: var(--signal-ink); }
+
+/* toolbox + education */
+.cols { display: grid; gap: 28px 40px; }
+@media (min-width: 760px) { .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cols h3 { font-family: var(--mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+.cols p { margin: 0; color: var(--ink-2); font-size: 16px; }
+.edu { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
+.edu li { padding: 14px 0; border-bottom: 1px solid var(--rule); display: grid; gap: 2px 28px; }
+@media (min-width: 760px) { .edu li { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); } }
+.edu b { font-weight: 600; }
+.edu span { color: var(--ink-2); }
+
+/* contact */
+.contact pre { font-size: 14px; color: var(--ink); }
+.contact pre a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--signal); }
+.contact pre a:hover { color: var(--signal-ink); }
+.contact .alt { margin-top: 24px; font-family: var(--mono); font-size: 13px; display: flex; flex-wrap: wrap; gap: 8px 24px; }
+footer { border-top: 1px solid var(--rule); padding-top: 22px; padding-bottom: 40px; font-family: var(--mono); font-size: 11px; color: var(--ink-3); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; line-height: 1.7; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="bar">
+    <a class="who" href="#top">aryan.awasthi</a>
+    <nav aria-label="Sections">
+      <a href="#work">Work</a>
+      <a class="opt" href="#experience">Experience</a>
+      <a class="opt" href="#projects">Projects</a>
+      <a class="opt" href="#journey">Journey</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-name">
+      <h1 id="hero-name" class="sr-only">Aryan Awasthi</h1>
+      <div class="name fit" aria-hidden="true">
+        <div class="wide"><pre class="ascii" data-converge>      .o.       ooooooooo.   oooooo   oooo       .o.       ooooo      ooo
+     .888.      `888   `Y88.  `888.   .8'       .888.      `888b.     `8'
+    .8"888.      888   .d88'   `888. .8'       .8"888.      8 `88b.    8
+   .8' `888.     888ooo88P'     `888.8'       .8' `888.     8   `88b.  8
+  .88ooo8888.    888`88b.        `888'       .88ooo8888.    8     `88b.8
+ .8'     `888.   888  `88b.       888       .8'     `888.   8       `888
+o88o     o8888o o888o  o888o     o888o     o88o     o8888o o8o        `8</pre><div class="gap"></div><pre class="ascii" data-converge>      .o.       oooooo   oooooo     oooo       .o.        .oooooo..o ooooooooooooo ooooo   ooooo ooooo
+     .888.       `888.    `888.     .8'       .888.      d8P'    `Y8 8'   888   `8 `888'   `888' `888'
+    .8"888.       `888.   .8888.   .8'       .8"888.     Y88bo.           888       888     888   888
+   .8' `888.       `888  .8'`888. .8'       .8' `888.     `"Y8888o.       888       888ooooo888   888
+  .88ooo8888.       `888.8'  `888.8'       .88ooo8888.        `"Y88b      888       888     888   888
+ .8'     `888.       `888'    `888'       .8'     `888.  oo     .d8P      888       888     888   888
+o88o     o8888o       `8'      `8'       o88o     o8888o 8""88888P'      o888o     o888o   o888o o888o</pre></div>
+        <div class="narrow"><pre class="ascii" data-converge>   ___   _____  _____   _  __
+  / _ | / _ \ \/ / _ | / |/ /
+ / __ |/ , _/\  / __ |/    /
+/_/ |_/_/|_| /_/_/ |_/_/|_/</pre><div class="gap"></div><pre class="ascii" data-converge>   ___ _      _____   ____________ ______
+  / _ | | /| / / _ | / __/_  __/ // /  _/
+ / __ | |/ |/ / __ |_\ \  / / / _  // /
+/_/ |_|__/|__/_/ |_/___/ /_/ /_//_/___/</pre></div>
+      </div>
+
+      <div class="hero-grid">
+        <p class="kicker"><b>ML and data</b>New Delhi, India<br>B.E. ENC, 2027</p>
+        <div>
+          <p class="lead">I build models, and the <em>measurements</em> that tell you whether they work.</p>
+          <p class="sub">Final-year Electronics and Computer Engineering student at Thapar Institute. Most recently an <strong>AI Research Intern on model evaluation</strong> at Appy Pie (Pixazo), where I ranked 15 models over 1,050 match-ups with Elo and Bradley-Terry. <strong>2nd on the public leaderboard</strong> of the SHL Hiring Assessment 2026 on Kaggle.</p>
+          <div class="actions">
+            <a class="btn primary" href="mailto:aryanawasthi017@gmail.com">Email me</a>
+            <a class="btn" href="AryanAwasthi.pdf">Resume (PDF)</a>
+            <a class="tl" href="https://github.com/Techy-A">GitHub</a>
+            <a class="tl" href="https://www.linkedin.com/in/aryan--awasthi">LinkedIn</a>
+          </div>
+          <p class="status">Open to ML, data and analytics internships and new-grad roles.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Highlight -->
+    <section class="sec" id="work" aria-labelledby="work-h">
+      <header class="rail"><p class="k">Highlight</p><p class="v">Kaggle, 2026<br>SHL Hiring Assessment</p></header>
+      <div>
+        <h2 id="work-h">Scoring spoken grammar from 60 seconds of audio</h2>
+        <div class="prose">
+          <p>The model listens to 45 to 60 seconds of spontaneous spoken English and predicts a grammar score from 0 to 5. The hard part is that speech recognisers correct grammar by default, which removes the very errors the model has to score.</p>
+        </div>
+
+        <figure>
+          <div class="plate">
+            <div class="fit"><pre id="wave" aria-hidden="true"></pre></div>
+            <dl class="diff">
+              <dt>said</dt><dd>he <span class="hl">don't</span> like it</dd>
+              <dt>whisper</dt><dd>he <span class="strike">doesn't</span> like it <span class="dim">  &lt;- the error is corrected away</span></dd>
+            </dl>
+          </div>
+          <figcaption><b>Fig. 1</b>  Illustrative waveform. The fix: prompt Whisper with a transcript full of fillers and mistakes, so it keeps the speaker's errors instead of repairing them.</figcaption>
+        </figure>
+
+        <div class="readout" role="list">
+          <div role="listitem"><span class="n">0<i>.</i>3207</span><span class="l">public leaderboard<br>2nd, 1st was 0.3064</span></div>
+          <div role="listitem"><span class="n">0<i>.</i>909</span><span class="l">Pearson r, out of fold<br>speaker-grouped</span></div>
+          <div role="listitem"><span class="n">0<i>.</i>516</span><span class="l">RMSE, out of fold<br>training set</span></div>
+          <div role="listitem"><span class="n">37<i>/</i>37</span><span class="l">score-0 training clips<br>caught by the gate</span></div>
+        </div>
+
+        <div class="prose">
+          <p>Each clip is judged three ways: <strong>what was said</strong> (verbatim Whisper transcripts into DeBERTa-v3-large embeddings), <strong>how it was said</strong> (frozen WavLM and Whisper-encoder embeddings, which turned out to be the strongest signal), and <strong>what an audio language model hears</strong> (Voxtral-Mini-3B hidden states). A non-negative blend combines them, and a WavLM gate sets the clips that score zero.</p>
+        </div>
+
+        <figure>
+          <div class="plate">
+            <div class="fit"><pre id="lb" aria-hidden="true"></pre></div>
+          </div>
+          <figcaption><b>Fig. 2</b>  Public leaderboard by submission. Bar length is the score above 0.300, so shorter is better. The amber row is the final model. The leaderboard metric mixes RMSE with a correlation term, so it is not on the same scale as the out-of-fold RMSE.</figcaption>
+          <div class="sr-only"><table>
+            <caption>Public leaderboard score by submission</caption>
+            <thead><tr><th>Version</th><th>Change</th><th>Public score</th></tr></thead>
+            <tbody id="lb-table"></tbody>
+          </table></div>
+        </figure>
+
+        <div class="lessons">
+          <div>
+            <span class="tag">validation</span>
+            <h3>Speakers repeat</h3>
+            <p>Training clips come in speaker twins, so random folds let a model recognise the voice. Every fold is speaker-grouped and tuned to sit as far from training as the test set does.</p>
+          </div>
+          <div>
+            <span class="tag">distribution shift</span>
+            <h3>Test clips are shorter</h3>
+            <p>71% of test clips run 55 seconds or less, against 26% in training. Training on test-length crops was the biggest single gain: 0.3454 to 0.3350.</p>
+          </div>
+          <div>
+            <span class="tag">metric probing</span>
+            <h3>The metric is not pure RMSE</h3>
+            <p>Two probe submissions exposed a Pearson component and a test-set bias of +0.118. The predicted score after removing it was 0.3259 to 0.3264. The actual result was 0.3262.</p>
+          </div>
+        </div>
+
+        <p class="more"><a href="https://github.com/Techy-A/shl-grammar-scoring">Read the code and full report on GitHub</a></p>
+      </div>
+    </section>
+
+    <!-- Experience -->
+    <section class="sec" id="experience" aria-labelledby="exp-h">
+      <header class="rail"><p class="k">Experience</p><p class="v">Jun to Jul 2026<br>2-month internship</p></header>
+      <div>
+        <h2 id="exp-h">Making a model leaderboard you can trust</h2>
+        <div class="role-head">
+          <h3>AI Research Intern, Data and Model Evaluation</h3>
+        </div>
+        <p class="role-org">Appy Pie (Pixazo), Noida</p>
+
+        <div class="readout" role="list">
+          <div role="listitem"><span class="n">1<i>,</i>050</span><span class="l">match-ups rated<br>across 15 models</span></div>
+          <div role="listitem"><span class="n">3</span><span class="l">broken signals<br>caught pre-launch</span></div>
+          <div role="listitem"><span class="n">22</span><span class="l">panels in the<br>cost dashboard</span></div>
+          <div role="listitem"><span class="n">73</span><span class="l">catalog models<br>audited</span></div>
+        </div>
+
+        <ul class="ledger">
+          <li><span class="what">Model leaderboard</span><p>Built a statistical evaluation system using <strong>Elo, Bradley-Terry MLE and bootstrap confidence intervals</strong>. It caught three broken scoring signals and a leaderboard discrepancy before launch.</p></li>
+          <li><span class="what">Cost analytics</span><p>Shipped a React dashboard with live per-model cost, an <strong>Elo-per-dollar ranking</strong> and a quality-versus-cost Pareto frontier. It became the team's reference for model purchasing.</p></li>
+          <li><span class="what">API forensics</span><p>Probed more than six production model endpoints and documented hidden behaviour, including a 14-image input limit, async submit-then-poll and field-name mismatches. The public API reference was corrected as a result.</p></li>
+          <li><span class="what">Docs audit</span><p>Audited the 73-model catalog, surfaced a rendering bug present on every model page and fixed pricing inconsistencies.</p></li>
+          <li><span class="what">Process</span><p>Replaced manual reporting with an automated cost-tracking pipeline covering 15+ models across 6 modalities.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section class="sec" id="projects" aria-labelledby="proj-h">
+      <header class="rail"><p class="k">Projects</p><p class="v">2024 to 2026</p></header>
+      <div>
+        <h2 id="proj-h">Projects, each drawn as its pipeline</h2>
+        <ol class="projects">
+          <li class="proj">
+            <div>
+              <h3><a href="https://github.com/Techy-A/collegebot-rag">CollegeBot<span class="ext">collegebot-rag</span></a></h3>
+              <p>A grounded RAG assistant for college questions. Hybrid retrieval, cited answers and explicit refusals in a Streamlit app, with a two-layer evaluation harness and a QLoRA fine-tuning pipeline for Phi-3-mini and Mistral-7B.</p>
+              <p class="fact">88.6% of facts reach the context, up from 77.1%. 2,185 chunks from 24 documents. 64 offline tests.</p>
+            </div>
+            <div class="pipe fit"><pre aria-hidden="true">question
+   |
+   +--&gt; <b>FAISS</b> (dense) ---+
+   |                      +--&gt; reciprocal rank fusion
+   +--&gt; <b>BM25</b> (sparse) ---+            |
+                                       v
+                        <b>Llama 3.1</b> on Groq
+                                       |
+                    cited answer  or  refusal</pre></div>
+          </li>
+          <li class="proj">
+            <div>
+              <h3><a href="https://github.com/Techy-A/IMAGE-LLP-VISION">Text-to-image evaluation arena<span class="ext">IMAGE-LLP-VISION</span></a></h3>
+              <p>A pairwise evaluation arena for text-to-image models. Images compete in round-robin tournaments within each prompt group, are judged by five scorers and ranked with Elo and Bradley-Terry MLE. Includes checkpointing, heatmaps and CSV and JSON export.</p>
+              <p class="fact">5 scorers. Runs fully local, zero API cost.</p>
+            </div>
+            <div class="pipe fit"><pre aria-hidden="true">prompt group --&gt; images A B C D
+                      |
+             round-robin pairs  (A,B) (A,C) ...
+                      |
+   +------------------+-------------------+
+   <b>PickScore  HPSv2  ImageReward  VQAScore  VLM judge</b>
+   +------------------+-------------------+
+                      |
+           <b>Elo</b> + <b>Bradley-Terry MLE</b> --&gt; ranking</pre></div>
+          </li>
+          <li class="proj">
+            <div>
+              <h3><a href="https://github.com/Techy-A/LORA_for_GPU">Audio LLM grammar scorer<span class="ext">LORA_for_GPU</span></a></h3>
+              <p>QLoRA fine-tuning of Voxtral-Mini-3B, an audio language model, to score spoken grammar end to end. Speaker-grouped 5-fold cross-validation and a one-command PowerShell pipeline.</p>
+              <p class="fact">A 3B audio LLM fine-tuned on an 8 GB GPU.</p>
+            </div>
+            <div class="pipe fit"><pre aria-hidden="true">audio clip
+   |
+   v
+<b>Voxtral-Mini-3B</b>      4-bit NF4, frozen
+   + LoRA adapters    r = 16, attention layers
+   |
+   v
+linear score head --&gt; grammar score 0 to 5</pre></div>
+          </li>
+          <li class="proj">
+            <div>
+              <h3><a href="https://github.com/Techy-A/Self-Pruning-Neural-Network---Tredence-Analytics">Self-pruning neural network<span class="ext">PyTorch</span></a></h3>
+              <p>A PyTorch network on CIFAR-10 in which every weight carries a learnable gate. The optimiser drives gates toward zero during training, so the model sparsifies itself without a separate pruning step.</p>
+              <p class="fact">Case study for the Tredence AI Engineering internship.</p>
+            </div>
+            <div class="pipe fit"><pre aria-hidden="true">weight w  x  gate g        g is learned
+                      |
+          training pushes g toward 0
+                      |
+   [##.#..#.##...#.#..##.#...#..]  surviving weights
+                      |
+                 sparse model</pre></div>
+          </li>
+          <li class="proj">
+            <div>
+              <h3><a href="https://github.com/Techy-A/Stock-Market-Prediction-Analysis">Stock market direction<span class="ext">time series</span></a></h3>
+              <p>Five years of market data and more than 50 engineered features (RSI, MACD, Bollinger Bands, lags). Random Forest, XGBoost and BiLSTM compared with time-aware validation, plus a backtester.</p>
+              <p class="fact">Evaluated on Sharpe ratio, returns and drawdown.</p>
+            </div>
+            <div class="pipe fit"><pre aria-hidden="true">5 years of prices --&gt; 50+ features
+                              |
+        +---------------------+---------------------+
+   <b>Random Forest</b>           <b>XGBoost</b>                <b>BiLSTM</b>
+        +---------------------+---------------------+
+                              |
+        time-aware validation --&gt; backtest</pre></div>
+          </li>
+          <li class="proj">
+            <div>
+              <h3><a href="https://github.com/Amritesh-Bhardwaj/Poker">Plato Sniper<span class="ext">team project</span></a></h3>
+              <p>A poker decision engine. Monte Carlo simulation estimates hand equity under incomplete information, which is compared against pot odds to choose GTO-inspired actions.</p>
+              <p class="fact">1,500+ simulated trials per decision.</p>
+            </div>
+            <div class="pipe fit"><pre aria-hidden="true">hand + board
+     |
+     v
+1,500+ Monte Carlo deals --&gt; <b>equity</b>
+                               |
+                  equity  vs  <b>pot odds</b>
+                               |
+                 fold  /  call  /  raise</pre></div>
+          </li>
+        </ol>
+        <div class="more">
+          Also on GitHub:
+          <ul>
+            <li><a href="https://github.com/Techy-A/OptiVector">OptiVector</a>, which turns PNG and JPG raster images into clean, scalable vector paths</li>
+            <li><a href="https://github.com/Techy-A/Classification-on-MNIST-784-">MNIST-784 classification</a>, about 90% multiclass accuracy and 0.998 ROC-AUC on the binary task</li>
+            <li><a href="https://github.com/Techy-A/California-Housing-ml">California housing</a> price regression and <a href="https://github.com/Techy-A/Classification-of-iris-flower">Iris</a> classification</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Journey -->
+    <section class="sec" id="journey" aria-labelledby="jour-h">
+      <header class="rail"><p class="k">Journey</p><p class="v">2023 to 2027</p></header>
+      <div>
+        <h2 id="jour-h">How I got here</h2>
+        <ol class="journey">
+          <li><span class="y">2023</span><span class="t" aria-hidden="true">--+--</span><span class="e">Started B.E. ENC at Thapar Institute of Engineering and Technology</span></li>
+          <li><span class="y"></span><span class="t" aria-hidden="true">  |--</span><span class="e">Joined Team Fateh, low voltage systems</span></li>
+          <li><span class="y">2024</span><span class="t" aria-hidden="true">--+--</span><span class="e">Stock direction prediction with ML and BiLSTM</span></li>
+          <li><span class="y">2025</span><span class="t" aria-hidden="true">--+--</span><span class="e">CollegeBot, an end-to-end RAG chatbot</span></li>
+          <li><span class="y">2026</span><span class="t" aria-hidden="true">--+--</span><span class="e">Self-pruning neural network, Tredence case study</span></li>
+          <li><span class="y"></span><span class="t" aria-hidden="true">  |--</span><span class="e">AI Research Intern at Appy Pie (Pixazo)</span></li>
+          <li class="now"><span class="y"></span><span class="t" aria-hidden="true">  |--</span><span class="e">2nd on the SHL Kaggle public leaderboard</span></li>
+          <li><span class="y">2027</span><span class="t" aria-hidden="true">--o  </span><span class="e">Graduating</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Toolbox and education -->
+    <section class="sec" id="toolbox" aria-labelledby="tool-h">
+      <header class="rail"><p class="k">Toolbox</p><p class="v">and education</p></header>
+      <div>
+        <h2 id="tool-h">Tools, and where they come from</h2>
+        <div class="cols">
+          <div><h3>ML and GenAI</h3><p>PyTorch, TensorFlow and Keras, scikit-learn, XGBoost, Hugging Face, LangChain, RAG, QLoRA and PEFT</p></div>
+          <div><h3>Statistics</h3><p>Elo and Bradley-Terry ratings, hypothesis testing, bootstrap confidence intervals, time-series evaluation, F1, ROC-AUC, precision and recall</p></div>
+          <div><h3>Data and BI</h3><p>SQL, PostgreSQL, MongoDB, BigQuery, Power BI, pandas, NumPy, Excel and Google Sheets automation</p></div>
+          <div><h3>Engineering</h3><p>Python, C++, JavaScript, React, FastAPI, Flask, Django, Streamlit, Docker, Kubernetes, AWS, Git</p></div>
+          <div><h3>Product analytics</h3><p>Google Analytics, Mixpanel, Hotjar, Microsoft Clarity, Figma</p></div>
+        </div>
+
+        <ul class="edu" style="margin-top:48px">
+          <li><b>Thapar Institute of Engineering and Technology, Patiala</b><span>B.E. Electronics and Computer Engineering, 2023 to 2027 (expected)</span></li>
+          <li><b>Kaggle: SHL Hiring Assessment 2026</b><span>2nd on the public leaderboard, score 0.3207</span></li>
+          <li><b>JEE Mains 2023</b><span>92.2 percentile</span></li>
+          <li><b>Team Fateh, low voltage systems</b><span>MPU-6050 gyroscope sensor system for driver indications, PCB design and system-level debugging</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="sec contact" id="contact" aria-labelledby="con-h">
+      <header class="rail"><p class="k">Contact</p><p class="v">New Delhi, India<br>IST, UTC+5:30</p></header>
+      <div>
+        <h2 id="con-h">Hiring for an ML, data or analytics role? Email me.</h2>
+        <div class="fit" aria-hidden="true"><pre>+------------------------------------+
+|                                    |
+|   <a href="mailto:aryanawasthi017@gmail.com" tabindex="-1">aryanawasthi017@gmail.com</a>        |
+|                                    |
++------------------------------------+</pre></div>
+        <p class="alt">
+          <a class="sr-only" href="mailto:aryanawasthi017@gmail.com">Email aryanawasthi017@gmail.com</a>
+          <a href="https://www.linkedin.com/in/aryan--awasthi">LinkedIn</a>
+          <a href="https://github.com/Techy-A">GitHub</a>
+          <a href="AryanAwasthi.pdf">Resume (PDF)</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Aryan Awasthi, 2026</span>
+    <span>Set in Schibsted Grotesk, Martian Mono and Doto. Lettering in FIGlet Roman and Small Slant.</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- measure the mono font ---------- */
+  var probe = document.createElement("span");
+  probe.style.cssText = "position:absolute;visibility:hidden;white-space:pre;font-size:100px;font-family:" + getComputedStyle(document.documentElement).getPropertyValue("--mono");
+  probe.textContent = "0000000000";
+  function charRatio() {
+    document.body.appendChild(probe);
+    var r = probe.getBoundingClientRect().width / 1000;
+    document.body.removeChild(probe);
+    return r;
+  }
+
+  /* ---------- Fig. 1: waveform of "he don't like it" ---------- */
+  function rng(seed) { return function () { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }; }
+  function buildWave() {
+    var el = document.getElementById("wave");
+    var box = el.parentNode;
+    var cols = Math.max(40, Math.min(96, Math.floor(box.clientWidth / (11 * charRatio()))));
+    var r = rng(7), rows = 3, s = cols / 68;
+    // word spans on a 68-column grid: [start, end, peak]; "don't" is the error
+    var words = [[3, 9, 0.75], [14, 27, 1.0], [32, 44, 0.8], [50, 56, 0.65]].map(function (w) {
+      return [Math.round(w[0] * s), Math.round(w[1] * s), w[2]];
+    });
+    var hiStart = words[1][0], hiEnd = words[1][1];
+    var amp = [];
+    for (var c = 0; c < cols; c++) {
+      var a = 0.04 + r() * 0.06;
+      words.forEach(function (w) {
+        if (c >= w[0] && c <= w[1]) {
+          var t = (c - w[0]) / (w[1] - w[0]);
+          a = Math.max(a, w[2] * Math.sin(Math.PI * t) * (0.55 + r() * 0.45));
+        }
+      });
+      amp.push(a);
+    }
+    var lines = [];
+    for (var k = rows; k >= -rows; k--) {
+      var line = "";
+      for (var c2 = 0; c2 < cols; c2++) {
+        var lvl = amp[c2] * (rows + 0.6), d = Math.abs(k), ch;
+        if (k === 0) ch = lvl > 0.5 ? "|" : "-";
+        else if (lvl > d + 0.5) ch = "|";
+        else if (lvl > d) ch = ":";
+        else if (lvl > d - 0.25) ch = ".";
+        else ch = " ";
+        if (c2 >= hiStart && c2 <= hiEnd && ch !== " " && ch !== "-") ch = '<span class="hl">' + ch + "</span>";
+        line += ch;
+      }
+      lines.push(line);
+    }
+    var labels = Array(cols + 1).join(" ").split("");
+    function put(str, w) { var at = Math.round((w[0] + w[1]) / 2 - str.length / 2); for (var i = 0; i < str.length; i++) labels[at + i] = str[i]; }
+    put("he", words[0]); put("don't", words[1]); put("like", words[2]); put("it", words[3]);
+    var lab = labels.join("").replace("don't", '<span class="hl">don\'t</span>');
+    lines.push(""); lines.push(lab);
+    el.innerHTML = lines.join("\n");
+  }
+
+  /* ---------- Fig. 2: leaderboard ASCII bar chart ---------- */
+  var LB = [
+    ["v1", "text + audio blend, score-0 gate", 0.3463],
+    ["v2", "+ SVR on audio embeddings", 0.3454],
+    ["v3", "+ WavLM-large, Whisper encoder", 0.3550],
+    ["v4", "SVRs trained on test-length crops", 0.3384],
+    ["v6", "all models trained on 4 crops", 0.3373],
+    ["v7", "+ text models on crop transcripts", 0.3350],
+    ["v7b", "remove measured test bias of 0.118", 0.3262],
+    ["v8", "stretch full-length clips by 1.15", 0.3241],
+    ["v9", "+ Voxtral audio LLM features", 0.3224],
+    ["final", "one Ridge over Voxtral + encoders", 0.3207]
+  ];
+  function pad(s, n) { s = String(s); while (s.length < n) s += " "; return s; }
+  function buildLB() {
+    var el = document.getElementById("lb");
+    var box = el.parentNode;
+    var w = box.clientWidth;
+    var wide = w >= 640;
+    var barW = wide ? 36 : 22, lo = 0.30, hi = 0.36;
+    var out = [];
+    var first = Math.round((0.3064 - lo) / (hi - lo) * barW);
+    LB.forEach(function (row, i) {
+      var n = Math.round((row[2] - lo) / (hi - lo) * barW);
+      var bar = Array(n + 1).join("#") + Array(barW - n + 1).join(".");
+      var lbl = pad(row[0], 6) + (wide ? pad(row[1], 36) : "");
+      var line = lbl + bar + "  " + row[2].toFixed(4);
+      if (i === LB.length - 1) line = '<span class="hl">' + line + "  2nd</span>";
+      out.push(line);
+    });
+    var axis = pad("", 6) + (wide ? pad("", 36) : "") + Array(first + 1).join(" ") + "^";
+    out.push('<span class="dim">' + axis + "</span>");
+    out.push('<span class="dim">' + pad("", 6) + (wide ? pad("", 36) : "") + Array(Math.max(first - 3, 0) + 1).join(" ") + "1st place 0.3064</span>");
+    el.innerHTML = out.join("\n");
+    var tb = document.getElementById("lb-table");
+    if (!tb.children.length) {
+      tb.innerHTML = LB.map(function (r) { return "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td><td>" + r[2].toFixed(4) + "</td></tr>"; }).join("");
+    }
+  }
+
+  /* ---------- scale ASCII blocks to their container ---------- */
+  function longest(pre) { return pre.textContent.split("\n").reduce(function (m, l) { return Math.max(m, l.length); }, 0); }
+  function fitAll() {
+    var r = charRatio();
+    var pipeSize = Infinity;
+    var jobs = [];
+    document.querySelectorAll(".fit").forEach(function (box) {
+      var pres = Array.prototype.filter.call(box.querySelectorAll("pre"), function (p) { return p.offsetParent !== null; });
+      if (!pres.length) return;
+      var L = pres.reduce(function (m, p) { return Math.max(m, longest(p)); }, 0) + 2;
+      var cs = getComputedStyle(box);
+      var w = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var isName = box.classList.contains("name"), isPipe = box.classList.contains("pipe");
+      var max = isName ? 22 : (isPipe ? 12 : 13.5);
+      var size = Math.min(max, w / (L * r));
+      if (!isName) size = Math.max(size, 9);
+      if (isPipe) pipeSize = Math.min(pipeSize, size);
+      jobs.push([pres, size, isPipe]);
+    });
+    jobs.forEach(function (j) {
+      var size = j[2] ? pipeSize : j[1];
+      j[0].forEach(function (p) { p.style.fontSize = size + "px"; });
+    });
+  }
+
+  /* ---------- the name converges out of noise ---------- */
+  function converge() {
+    var ramp = ".:-=+*o#%@8";
+    document.querySelectorAll("pre[data-converge]").forEach(function (pre) {
+      var target = pre.textContent;
+      if (reduce) return;
+      var chars = target.split(""), n = chars.length, start = null, dur = 1100;
+      var lineLen = target.indexOf("\n") + 1 || n;
+      var delay = chars.map(function (ch, i) { var col = i % lineLen; return (col / lineLen) * 0.6 + Math.random() * 0.4; });
+      function frame(ts) {
+        if (start === null) start = ts;
+        var p = (ts - start) / dur, s = "";
+        for (var i = 0; i < n; i++) {
+          var ch = chars[i];
+          if (ch === " " || ch === "\n" || p >= delay[i]) s += ch;
+          else s += ramp.charAt((Math.random() * ramp.length) | 0);
+        }
+        pre.textContent = s;
+        if (p < 1) requestAnimationFrame(frame); else pre.textContent = target;
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+
+  buildWave();
+  buildLB();
+  fitAll();
+  converge();
+  var t;
+  window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(function () { buildWave(); buildLB(); fitAll(); }, 80); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { buildWave(); buildLB(); fitAll(); });
+})();
+</script>
+</body>
+</html>
