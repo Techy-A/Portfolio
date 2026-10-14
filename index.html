@@ -6,6 +6,31 @@
 <title>Aryan Awasthi</title>
 <meta name="description" content="Aryan Awasthi builds machine learning models and the measurements that tell you whether they work. Speech ML, RAG, model evaluation.">
 <meta name="color-scheme" content="light dark">
+<link rel="canonical" href="https://techy-a.github.io/portfolio/">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="Aryan Awasthi">
+<meta property="og:title" content="Aryan Awasthi, machine learning and model evaluation">
+<meta property="og:description" content="2nd on the SHL Kaggle public leaderboard. AI Research Intern on model evaluation at Appy Pie (Pixazo). Open to ML, data and analytics roles.">
+<meta property="og:url" content="https://techy-a.github.io/portfolio/">
+<meta property="og:image" content="https://techy-a.github.io/portfolio/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+<meta property="og:image:alt" content="Aryan Awasthi in ASCII lettering, with the line: I build models, and the measurements that tell you whether they work.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Aryan Awasthi",
+  "url": "https://techy-a.github.io/portfolio/",
+  "email": "mailto:aryanawasthi017@gmail.com",
+  "description": "Machine learning and data student who builds models and the evaluation that measures them.",
+  "address": { "@type": "PostalAddress", "addressLocality": "New Delhi", "addressCountry": "IN" },
+  "affiliation": { "@type": "CollegeOrUniversity", "name": "Thapar Institute of Engineering and Technology" },
+  "knowsAbout": ["Machine learning", "Model evaluation", "Speech and audio ML", "Retrieval-augmented generation", "Statistics"],
+  "sameAs": ["https://github.com/Techy-A", "https://www.linkedin.com/in/aryan--awasthi"]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Doto:wght@600;900&family=Martian+Mono:wght@300;400;500&family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -199,6 +224,14 @@ figcaption b { color: var(--ink-2); font-weight: 500; }
 .proj h3 a:hover { text-decoration: underline; }
 .proj h3 .ext { white-space: nowrap; font-family: var(--mono); font-size: 12px; color: var(--ink-3); font-weight: 400; margin-left: 6px; }
 .proj p { margin: 6px 0 0; color: var(--ink-2); font-size: 16px; }
+.case { display: grid; grid-template-columns: 9ch minmax(0, 1fr); gap: 10px 14px; margin: 12px 0 0; }
+.case dt { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); padding-top: 4px; }
+.case dd { margin: 0; color: var(--ink-2); font-size: 15px; line-height: 1.55; }
+.case dd strong { color: var(--ink); font-weight: 600; }
+.dropped { list-style: none; padding: 0; margin: 14px 0 0; font-family: var(--mono); font-size: 12px; color: var(--ink-2); display: grid; gap: 6px; }
+@media (min-width: 760px) { .dropped { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 32px; } }
+.dropped li::before { content: "[x]" / ""; color: var(--signal-ink); margin-right: 10px; }
+.sec .dropped-h { margin-top: 48px; font-size: 17px; }
 .proj .fact { font-family: var(--mono); font-size: 12px; color: var(--signal-ink); margin-top: 10px; }
 .proj .pipe { background: var(--paper-2); border: 1px solid var(--rule); padding: 14px 16px; border-radius: 2px; }
 .proj .pipe pre { font-size: 12px; color: var(--ink-2); }
@@ -284,7 +317,7 @@ o88o     o8888o       `8'      `8'       o88o     o8888o 8""88888P'      o888o  
         <p class="kicker"><b>ML and data</b>New Delhi, India<br>B.E. ENC, 2027</p>
         <div>
           <p class="lead">I build models, and the <em>measurements</em> that tell you whether they work.</p>
-          <p class="sub">Final-year Electronics and Computer Engineering student at Thapar Institute. Most recently an <strong>AI Research Intern on model evaluation</strong> at Appy Pie (Pixazo), where I ranked 15 models over 1,050 match-ups with Elo and Bradley-Terry. <strong>2nd on the public leaderboard</strong> of the SHL Hiring Assessment 2026 on Kaggle.</p>
+          <p class="sub">Final-year Electronics and Computer Engineering student at Thapar Institute. Most recently an <strong>AI Research Intern on model evaluation</strong> at Appy Pie (Pixazo) from June to July 2026, where I ranked 15 models over 1,050 match-ups with Elo and Bradley-Terry. <strong>2nd on the public leaderboard</strong> of the SHL Hiring Assessment 2026 on Kaggle.</p>
           <div class="actions">
             <a class="btn primary" href="mailto:aryanawasthi017@gmail.com">Email me</a>
             <a class="btn" href="AryanAwasthi.pdf">Resume (PDF)</a>
@@ -357,6 +390,17 @@ o88o     o8888o       `8'      `8'       o88o     o8888o 8""88888P'      o888o  
           </div>
         </div>
 
+        <h3 class="dropped-h">Tried and dropped</h3>
+        <ul class="dropped">
+          <li>Rounding to the 0.5 label grid</li>
+          <li>Stretching the short test clips (0.3408)</li>
+          <li>An LLM judge, Qwen3-8B, reading transcripts</li>
+          <li>End-to-end fine-tuning of DeBERTa and WavLM</li>
+          <li>Grammar-error features: T5, CoLA, GPT-2</li>
+          <li>LanguageTool error counts</li>
+          <li>Test-time augmentation over shifted windows</li>
+          <li>Voxtral's upper layers</li>
+        </ul>
         <p class="more"><a href="https://github.com/Techy-A/shl-grammar-scoring">Read the code and full report on GitHub</a></p>
       </div>
     </section>
@@ -390,15 +434,18 @@ o88o     o8888o       `8'      `8'       o88o     o8888o 8""88888P'      o888o  
 
     <!-- Projects -->
     <section class="sec" id="projects" aria-labelledby="proj-h">
-      <header class="rail"><p class="k">Projects</p><p class="v">2024 to 2026</p></header>
+      <header class="rail"><p class="k">Projects</p><p class="v">2025 to 2026<br>Problem, result, limit</p></header>
       <div>
-        <h2 id="proj-h">Projects, each drawn as its pipeline</h2>
+        <h2 id="proj-h">Four projects, each drawn as its pipeline</h2>
         <ol class="projects">
           <li class="proj">
             <div>
               <h3><a href="https://github.com/Techy-A/collegebot-rag">CollegeBot<span class="ext">collegebot-rag</span></a></h3>
-              <p>A grounded RAG assistant for college questions. Hybrid retrieval, cited answers and explicit refusals in a Streamlit app, with a two-layer evaluation harness and a QLoRA fine-tuning pipeline for Phi-3-mini and Mistral-7B.</p>
-              <p class="fact">88.6% of facts reach the context, up from 77.1%. 2,185 chunks from 24 documents. 64 offline tests.</p>
+              <dl class="case">
+                <dt>Problem</dt><dd>Answer questions about admissions, fees, hostels and placements only from source documents, cite the document and page, and decline when the answer is not there.</dd>
+                <dt>Result</dt><dd>Hybrid dense and BM25 retrieval raised facts reaching the context from <strong>77.1% to 88.6%</strong>, matching a cross-encoder reranker with no added latency. 2,185 chunks from 24 documents, 64 offline tests.</dd>
+                <dt>Limit</dt><dd>Refusal accuracy is 0.87 to 0.97 against a 0.95 target. Older documents sometimes outrank current ones, so per-document authority weighting is the next measured change.</dd>
+              </dl>
             </div>
             <div class="pipe fit"><pre aria-hidden="true">question
    |
@@ -413,8 +460,11 @@ o88o     o8888o       `8'      `8'       o88o     o8888o 8""88888P'      o888o  
           <li class="proj">
             <div>
               <h3><a href="https://github.com/Techy-A/IMAGE-LLP-VISION">Text-to-image evaluation arena<span class="ext">IMAGE-LLP-VISION</span></a></h3>
-              <p>A pairwise evaluation arena for text-to-image models. Images compete in round-robin tournaments within each prompt group, are judged by five scorers and ranked with Elo and Bradley-Terry MLE. Includes checkpointing, heatmaps and CSV and JSON export.</p>
-              <p class="fact">5 scorers. Runs fully local, zero API cost.</p>
+              <dl class="case">
+                <dt>Problem</dt><dd>Rank images from text-to-image models fairly, comparing each image only with images made from the same prompt.</dd>
+                <dt>Result</dt><dd>Round-robin within prompt groups cuts 50 images from 1,225 matches to 225. Five scorers judge each match and Elo and Bradley-Terry MLE rank the results. Runs locally on Apple Silicon or CUDA, at zero API cost.</dd>
+                <dt>Limit</dt><dd>Ratings are comparable within a prompt group, not across groups.</dd>
+              </dl>
             </div>
             <div class="pipe fit"><pre aria-hidden="true">prompt group --&gt; images A B C D
                       |
@@ -429,13 +479,16 @@ o88o     o8888o       `8'      `8'       o88o     o8888o 8""88888P'      o888o  
           <li class="proj">
             <div>
               <h3><a href="https://github.com/Techy-A/LORA_for_GPU">Audio LLM grammar scorer<span class="ext">LORA_for_GPU</span></a></h3>
-              <p>QLoRA fine-tuning of Voxtral-Mini-3B, an audio language model, to score spoken grammar end to end. Speaker-grouped 5-fold cross-validation and a one-command PowerShell pipeline.</p>
-              <p class="fact">A 3B audio LLM fine-tuned on an 8 GB GPU.</p>
+              <dl class="case">
+                <dt>Problem</dt><dd>Fine-tune Voxtral-Mini-3B, an audio language model, to score spoken grammar on a consumer GPU, as one more model for the SHL blend.</dd>
+                <dt>Result</dt><dd>4-bit NF4 weights with LoRA adapters fit an <strong>8&nbsp;GB GPU</strong>. Speaker-grouped 5-fold cross-validation keeps the out-of-fold predictions honest.</dd>
+                <dt>Limit</dt><dd>A full run takes about 3 to 5 hours, and the model trains on 30-second crops, so longer test clips are scored in windows.</dd>
+              </dl>
             </div>
             <div class="pipe fit"><pre aria-hidden="true">audio clip
    |
    v
-<b>Voxtral-Mini-3B</b>      4-bit NF4, frozen
+<b>Voxtral-Mini-3B</b>      4-bit NF4, audio encoder frozen
    + LoRA adapters    r = 16, attention layers
    |
    v
@@ -444,53 +497,27 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
           <li class="proj">
             <div>
               <h3><a href="https://github.com/Techy-A/Self-Pruning-Neural-Network---Tredence-Analytics">Self-pruning neural network<span class="ext">PyTorch</span></a></h3>
-              <p>A PyTorch network on CIFAR-10 in which every weight carries a learnable gate. The optimiser drives gates toward zero during training, so the model sparsifies itself without a separate pruning step.</p>
-              <p class="fact">Case study for the Tredence AI Engineering internship.</p>
+              <dl class="case">
+                <dt>Problem</dt><dd>Prune a CIFAR-10 network while it trains, instead of in a separate step afterwards. Case study for the Tredence AI Engineering internship.</dd>
+                <dt>Result</dt><dd>Every weight in the classifier head has a sigmoid gate with an L1 penalty, so weights that do not help the loss are switched off. Three lambda values map the sparsity-accuracy trade-off.</dd>
+                <dt>Limit</dt><dd>Only the fully connected head is gated. It holds 89% of the parameters, and the convolutional layers are left unpruned to keep features stable.</dd>
+              </dl>
             </div>
-            <div class="pipe fit"><pre aria-hidden="true">weight w  x  gate g        g is learned
+            <div class="pipe fit"><pre aria-hidden="true">effective w = w  x  sigmoid(g)      g is learned
                       |
-          training pushes g toward 0
+   loss = cross-entropy + lambda x sum(gates)
                       |
    [##.#..#.##...#.#..##.#...#..]  surviving weights
                       |
-                 sparse model</pre></div>
-          </li>
-          <li class="proj">
-            <div>
-              <h3><a href="https://github.com/Techy-A/Stock-Market-Prediction-Analysis">Stock market direction<span class="ext">time series</span></a></h3>
-              <p>Five years of market data and more than 50 engineered features (RSI, MACD, Bollinger Bands, lags). Random Forest, XGBoost and BiLSTM compared with time-aware validation, plus a backtester.</p>
-              <p class="fact">Evaluated on Sharpe ratio, returns and drawdown.</p>
-            </div>
-            <div class="pipe fit"><pre aria-hidden="true">5 years of prices --&gt; 50+ features
-                              |
-        +---------------------+---------------------+
-   <b>Random Forest</b>           <b>XGBoost</b>                <b>BiLSTM</b>
-        +---------------------+---------------------+
-                              |
-        time-aware validation --&gt; backtest</pre></div>
-          </li>
-          <li class="proj">
-            <div>
-              <h3><a href="https://github.com/Amritesh-Bhardwaj/Poker">Plato Sniper<span class="ext">team project</span></a></h3>
-              <p>A poker decision engine. Monte Carlo simulation estimates hand equity under incomplete information, which is compared against pot odds to choose GTO-inspired actions.</p>
-              <p class="fact">1,500+ simulated trials per decision.</p>
-            </div>
-            <div class="pipe fit"><pre aria-hidden="true">hand + board
-     |
-     v
-1,500+ Monte Carlo deals --&gt; <b>equity</b>
-                               |
-                  equity  vs  <b>pot odds</b>
-                               |
-                 fold  /  call  /  raise</pre></div>
+           sparse classifier head</pre></div>
           </li>
         </ol>
         <div class="more">
           Also on GitHub:
           <ul>
+            <li><a href="https://github.com/Techy-A/Stock-Market-Prediction-Analysis">Stock market direction</a>, Random Forest, XGBoost and BiLSTM on 50+ features with time-aware validation and a backtester</li>
+            <li><a href="https://github.com/Amritesh-Bhardwaj/Poker">Plato Sniper</a>, a team poker engine that compares Monte Carlo equity with pot odds over 1,500+ trials per decision</li>
             <li><a href="https://github.com/Techy-A/OptiVector">OptiVector</a>, which turns PNG and JPG raster images into clean, scalable vector paths</li>
-            <li><a href="https://github.com/Techy-A/Classification-on-MNIST-784-">MNIST-784 classification</a>, about 90% multiclass accuracy and 0.998 ROC-AUC on the binary task</li>
-            <li><a href="https://github.com/Techy-A/California-Housing-ml">California housing</a> price regression and <a href="https://github.com/Techy-A/Classification-of-iris-flower">Iris</a> classification</li>
           </ul>
         </div>
       </div>

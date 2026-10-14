@@ -8,6 +8,9 @@ from pathlib import Path
 import pyfiglet
 
 ROOT = Path(__file__).resolve().parent.parent
+# Public address of the site. Link previews need absolute URLs, so change this
+# if the site is served from somewhere else (a custom domain, another repo name).
+SITE = "https://techy-a.github.io/portfolio/"
 
 
 def letter(text, font):
@@ -25,5 +28,6 @@ for key, text, font in [
     ("BASIC_W", "AWASTHI", "smslant"),
 ]:
     page = page.replace("{{" + key + "}}", letter(text, font))
+page = page.replace("{{SITE}}", SITE)
 (ROOT / "index.html").write_text(page, encoding="utf-8")
 print("wrote index.html")

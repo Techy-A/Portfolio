@@ -22,6 +22,8 @@ A single static page with no framework and no build step at runtime.
 | `src/index.template.html` | Source for `index.html`, with placeholders for the ASCII name lettering. |
 | `src/build.py` | Renders the FIGlet lettering into the template and writes `index.html`. |
 | `AryanAwasthi.pdf` | Resume, linked from the page. |
+| `og.png` | 1200 x 627 link preview for LinkedIn and other sites. |
+| `src/og.html` | Source for `og.png`. Screenshot it at 1200 x 627 to regenerate. |
 
 ## Editing
 
@@ -40,5 +42,8 @@ python src/build.py
 - House style: no em dashes, no en dashes, no emoji. The source is plain 7-bit ASCII.
 
 ## Publishing
+
+`SITE` in `src/build.py` is the public address used for the link preview and search metadata. It defaults to `https://techy-a.github.io/portfolio/`; change it and rebuild if the site lives elsewhere.
+
 
 Settings, Pages, deploy from branch `main`, folder `/ (root)`. Pages on a private repository needs a paid GitHub plan; on a free plan, make the repository public first.
