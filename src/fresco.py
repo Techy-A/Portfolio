@@ -29,9 +29,69 @@ EDGE_PCT = 78              # cells above this edge-strength percentile get a con
 CELL_ASPECT = 2.0          # a character cell is about twice as tall as it is wide
 BINS = 8                   # colour bins for tinting
 FADE = 0.14               # share of the width over which the arms fade out
+FLOOR = 3                 # lowest ramp step for skin inside the outline (":")
+EDGE_COV = 0.62           # an outline cell must be at least this much skin to be drawn
+EDGE_MIN = 6              # and at least this dense ("="), so no faint ; - trails hug the fingers
 GAP = (0.3792, 0.4538)     # the point between the two fingertips, as fractions of the fresco
 WIDE = (0.315, 0.37, 0.465, 0.528)    # both hands, wrist to fingertip
 NARROW = (0.345, 0.385, 0.44, 0.52)   # phones: the fingertips about to touch
+
+
+def strip_halos(lines, tints, fading, faint=" .,:;-", min_len=3):
+    """Remove one-row runs made only of the faintest characters that have nothing on
+    one side of them: the soft cast shadow a finger leaves on the plaster."""
+    rows = len(lines)
+    grid = [list(l) for l in lines]
+    blank = lambda r, a, b: r < 0 or r >= rows or not lines[r][a:b].strip()
+    for r in range(rows):
+        line, c = lines[r], 0
+        while c < len(line):
+            if line[c] == " ":
+                c += 1
+                continue
+            s = c
+            while c < len(line) and line[c] != " ":
+                c += 1
+            run = line[s:c]
+            in_fade = fading[r, s:c].any() if r < fading.shape[0] else False
+            if (len(run) >= min_len and all(ch in faint for ch in run) and not in_fade
+                    and (blank(r - 1, s, c) or blank(r + 1, s, c))):
+                for k in range(s, c):
+                    grid[r][k] = " "
+    out_l, out_t = [], []
+    for row, tn in zip(grid, tints):
+        s = "".join(row).rstrip()
+        out_l.append(s)
+        out_t.append([x if row[i] != " " else -1 for i, x in enumerate(tn[:len(s)])])
+    return out_l, out_t
+
+
+def despeckle(lines, tints, fading, min_cells=8):
+    """Remove small clusters of characters that are not part of a hand (specks of
+    plaster or stray outline), except in the fade zones where the scatter is wanted."""
+    rows, cols = len(lines), max(len(l) for l in lines)
+    ink = np.zeros((rows, cols), bool)
+    for i, l in enumerate(lines):
+        ink[i, :len(l)] = [ch != " " for ch in l]
+    keep_fade = np.zeros_like(ink)
+    keep_fade[:, :fading.shape[1]] = fading[:rows, :cols]
+    # characters with at most one neighbour are loose flecks
+    for _ in range(2):
+        nb = ndimage.convolve(ink.astype(int), np.ones((3, 3), int), mode="constant") - ink
+        ink &= (nb >= 2) | keep_fade
+    lab, n = ndimage.label(ink, structure=np.ones((3, 3)))
+    sizes = ndimage.sum(ink, lab, range(1, n + 1))
+    small = ~ink | np.isin(lab, [k + 1 for k, s in enumerate(sizes) if s < min_cells]) & ~keep_fade
+    out_l, out_t = [], []
+    for i, (l, tn) in enumerate(zip(lines, tints)):
+        chars, tt = list(l), list(tn)
+        for j in range(len(chars)):
+            if small[i, j]:
+                chars[j], tt[j] = " ", -1
+        s = "".join(chars).rstrip()
+        out_l.append(s)
+        out_t.append(tt[:len(s)])
+    return out_l, out_t
 
 
 def convert(path, crop, cols, sat_cut, gamma, contours=True, local=0.8):
@@ -76,6 +136,7 @@ def convert(path, crop, cols, sat_cut, gamma, contours=True, local=0.8):
     cov = cell(soft)
     rng = np.random.default_rng(7)
     grain = rng.random(cov.shape)
+    fading = cell(np.broadcast_to(fade[None, :], soft.shape)) < 0.999   # only the arm ends dissolve
     col = np.stack([cell(rgb[..., i] * soft) / np.maximum(cov, 1e-6) for i in range(3)], -1)
 
     def tensor(src, sigma):
@@ -100,8 +161,13 @@ def convert(path, crop, cols, sat_cut, gamma, contours=True, local=0.8):
     for i in range(rows):
         row, tint = [], []
         for j in range(cols):
-            # where the arm fades out, keep a scatter of characters instead of a hard edge
-            if cov[i, j] < 0.3 or (cov[i, j] < 0.9 and grain[i, j] > cov[i, j] ** 1.5):
+            # a clean outline everywhere, except where the arm fades out at the
+            # left and right edges, which keeps a scatter instead of a hard cut
+            if fading[i, j]:
+                drop = cov[i, j] < 0.3 or (cov[i, j] < 0.9 and grain[i, j] > cov[i, j] ** 1.5)
+            else:
+                drop = cov[i, j] < EDGE_COV
+            if drop:
                 row.append(" "), tint.append(-1)
                 continue
             edge_of_hand = cov[i, j] < 0.85 and m_str[i, j] > 0
@@ -110,18 +176,37 @@ def convert(path, crop, cols, sat_cut, gamma, contours=True, local=0.8):
             elif contours and l_str[i, j] > cut and l_coh[i, j] > 0.5:
                 ch = glyph(l_ang[i, j], l_gy[i, j])
             else:
-                k = int(t[i, j] * (len(RAMP) - 1) + 0.5)
-                ch = RAMP[max(1, min(len(RAMP) - 1, k))]
+                # shaded skin keeps a minimum density so the underside of a finger reads
+                # as form, not as a trail of dots; the outline drops its faintest cells
+                top = len(RAMP) - 1
+                if fading[i, j]:
+                    # the arm dissolves into dust: lighter characters as it fades
+                    k = max(1, int(t[i, j] * min(1.0, cov[i, j]) ** 1.5 * top + 0.5))
+                elif cov[i, j] >= 0.85:
+                    k = int(FLOOR + t[i, j] * (top - FLOOR) + 0.5)
+                else:
+                    k = int(t[i, j] * top + 0.5)
+                    if k < EDGE_MIN:
+                        row.append(" "), tint.append(-1)
+                        continue
+                ch = RAMP[max(1, min(top, k))]
             row.append(ch)
             # colour follows the light: 0 = deep ochre shadow ... BINS-1 = plaster highlight
             tint.append(int(min(BINS - 1, max(0, t[i, j] * BINS))))
         lines.append("".join(row).rstrip())
         tints.append(tint[:len(lines[-1])])
+    lines, tints = strip_halos(lines, tints, fading)
+    lines, tints = despeckle(lines, tints, fading)
     used = [i for i, l in enumerate(lines) if l.strip()]
     lines, tints = lines[used[0]:used[-1] + 1], tints[used[0]:used[-1] + 1]
-    # the spark sits midway between the two index fingertips
+    # the spark sits midway between the two index fingertips: start from the known
+    # point on the fresco, then centre it in the empty run of that row
     sr = int((GAP[1] - y0) / (y1 - y0) * rows) - used[0]
     sc = int((GAP[0] - x0) / (x1 - x0) * cols)
+    row = lines[sr].ljust(cols)
+    left = max((c for c in range(sc) if row[c] != " "), default=sc)
+    right = min((c for c in range(sc + 1, cols) if row[c] != " "), default=sc)
+    sc = (left + right) // 2
     return {"lines": lines, "tints": tints, "cols": cols, "rows": len(lines), "spark": [sr, sc]}
 
 
