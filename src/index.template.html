@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Aryan Awasthi</title>
-<meta name="description" content="Aryan Awasthi builds machine learning models and the measurements that tell you whether they work. Speech ML, RAG, model evaluation.">
+<meta name="description" content="Aryan Awasthi tries every reasonable answer, then proves which one is better. Machine learning, model evaluation, RAG and speech ML.">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="{{SITE}}">
 <meta property="og:type" content="profile">
 <meta property="og:site_name" content="Aryan Awasthi">
 <meta property="og:title" content="Aryan Awasthi, machine learning and model evaluation">
-<meta property="og:description" content="2nd on the SHL Kaggle public leaderboard. AI Research Intern on model evaluation at Appy Pie (Pixazo). Open to ML, data and analytics roles.">
+<meta property="og:description" content="I try every reasonable answer, then prove which one is better. AI Research Intern on model evaluation at Appy Pie (Pixazo). Open to ML, data and analytics roles.">
 <meta property="og:url" content="{{SITE}}">
 <meta property="og:image" content="{{SITE}}og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="627">
-<meta property="og:image:alt" content="Aryan Awasthi in ASCII lettering, with the line: I build models, and the measurements that tell you whether they work.">
+<meta property="og:image:alt" content="Aryan Awasthi in ASCII lettering, with the line: I try every reasonable answer, then prove which one is better.">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">
 {
@@ -24,7 +24,7 @@
   "name": "Aryan Awasthi",
   "url": "{{SITE}}",
   "email": "mailto:aryanawasthi017@gmail.com",
-  "description": "Machine learning and data student who builds models and the evaluation that measures them.",
+  "description": "Machine learning and data student who compares every reasonable approach and proves which one is better.",
   "address": { "@type": "PostalAddress", "addressLocality": "New Delhi", "addressCountry": "IN" },
   "affiliation": { "@type": "CollegeOrUniversity", "name": "Thapar Institute of Engineering and Technology" },
   "knowsAbout": ["Machine learning", "Model evaluation", "Speech and audio ML", "Retrieval-augmented generation", "Statistics"],
@@ -197,6 +197,17 @@ figcaption b { color: var(--ink-2); font-weight: 500; }
 .diff dt { color: var(--ink-3); }
 .diff dd { margin: 0; color: var(--ink); }
 
+.decisions { list-style: none; padding: 0; margin: 36px 0 0; border-top: 1px solid var(--rule); }
+.dec { padding: 28px 0 30px; border-bottom: 1px solid var(--rule); }
+.dec figure { margin: 18px 0; }
+.dq { font-size: 21px; font-weight: 600; letter-spacing: -.01em; line-height: 1.3; margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; text-wrap: balance; }
+.dq .src { font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--ink-3); letter-spacing: 0; }
+.opts { list-style: none; padding: 0; margin: 14px 0 0; font-family: var(--mono); font-size: 13px; color: var(--ink-3); display: grid; gap: 6px; }
+.opts li::before { content: "[ ]" / ""; margin-right: 10px; }
+.opts li.pick { color: var(--ink); }
+.opts li.pick::before { content: "[*]" / ""; color: var(--signal-ink); }
+.why { margin: 14px 0 0; color: var(--ink-2); max-width: 68ch; }
+.why b { color: var(--ink); font-weight: 600; }
 .lessons { display: grid; gap: 28px; margin-top: 8px; }
 @media (min-width: 760px) { .lessons { grid-template-columns: repeat(3, 1fr); gap: 32px; } }
 .lessons h3 { font-size: 17px; margin-bottom: 8px; }
@@ -279,7 +290,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 22px; padding-bottom: 4
   <header class="bar">
     <a class="who" href="#top">aryan.awasthi</a>
     <nav aria-label="Sections">
-      <a href="#work">Work</a>
+      <a href="#method">Method</a>
       <a class="opt" href="#experience">Experience</a>
       <a class="opt" href="#projects">Projects</a>
       <a class="opt" href="#journey">Journey</a>
@@ -298,8 +309,8 @@ footer { border-top: 1px solid var(--rule); padding-top: 22px; padding-bottom: 4
       <div class="hero-grid">
         <p class="kicker"><b>ML and data</b>New Delhi, India<br>B.E. ENC, 2027</p>
         <div>
-          <p class="lead">I build models, and the <em>measurements</em> that tell you whether they work.</p>
-          <p class="sub">Final-year Electronics and Computer Engineering student at Thapar Institute. Most recently an <strong>AI Research Intern on model evaluation</strong> at Appy Pie (Pixazo) from June to July 2026, where I ranked 15 models over 1,050 match-ups with Elo and Bradley-Terry. <strong>2nd on the public leaderboard</strong> of the SHL Hiring Assessment 2026 on Kaggle.</p>
+          <p class="lead">I try every reasonable answer, then <em>prove</em> which one is better.</p>
+          <p class="sub">Final-year Electronics and Computer Engineering student at Thapar Institute. Most recently an <strong>AI Research Intern on model evaluation</strong> at Appy Pie (Pixazo) from June to July 2026, where I ranked 15 models over 1,050 match-ups with Elo, Bradley-Terry and bootstrap confidence intervals.</p>
           <div class="actions">
             <a class="btn primary" href="mailto:aryanawasthi017@gmail.com">Email me</a>
             <a class="btn" href="AryanAwasthi.pdf">Resume (PDF)</a>
@@ -311,71 +322,93 @@ footer { border-top: 1px solid var(--rule); padding-top: 22px; padding-bottom: 4
       </div>
     </section>
 
-    <!-- Highlight -->
-    <section class="sec" id="work" aria-labelledby="work-h">
-      <header class="rail"><p class="k">Highlight</p><p class="v">Kaggle, 2026<br>SHL Hiring Assessment</p></header>
+    <!-- Method -->
+    <section class="sec" id="method" aria-labelledby="method-h">
+      <header class="rail"><p class="k">Method</p><p class="v">Six decisions<br>and the evidence</p></header>
       <div>
-        <h2 id="work-h">Scoring spoken grammar from 60 seconds of audio</h2>
+        <h2 id="method-h">Every answer gets tested against the alternatives</h2>
         <div class="prose">
-          <p>The model listens to 45 to 60 seconds of spontaneous spoken English and predicts a grammar score from 0 to 5. The hard part is that speech recognisers correct grammar by default, which removes the very errors the model has to score.</p>
+          <p>Before I commit to a design, I list the reasonable options, measure them on the same footing and keep the one the evidence supports. These are real decisions from my projects, with the options I compared and the reason the winner won.</p>
         </div>
 
-        <figure>
-          <div class="plate">
-            <div class="fit"><pre id="wave" aria-hidden="true"></pre></div>
-            <dl class="diff">
-              <dt>said</dt><dd>he <span class="hl">don't</span> like it</dd>
-              <dt>whisper</dt><dd>he <span class="strike">doesn't</span> like it <span class="dim">  &lt;- the error is corrected away</span></dd>
-            </dl>
-          </div>
-          <figcaption><b>Fig. 1</b>  Illustrative waveform. The fix: prompt Whisper with a transcript full of fillers and mistakes, so it keeps the speaker's errors instead of repairing them.</figcaption>
-        </figure>
+        <ol class="decisions">
+          <li class="dec">
+            <p class="dq">Dense, sparse or hybrid retrieval?<span class="src">CollegeBot</span></p>
+            <figure>
+              <div class="plate">
+                <div class="fit"><pre id="ret" aria-hidden="true"></pre></div>
+              </div>
+              <figcaption><b>Fig. 1</b>  Share of test questions whose answer fact reached the model's context, for five retrieval setups on the same corpus. The amber row is the one that shipped.</figcaption>
+              <div class="sr-only"><table>
+                <caption>Retrieval setups compared</caption>
+                <thead><tr><th>Setup</th><th>Fact reaches context</th><th>Added latency</th></tr></thead>
+                <tbody id="ret-table"></tbody>
+              </table></div>
+            </figure>
+            <p class="why"><b>Chose hybrid with reciprocal rank fusion.</b> It ties the best reranker at 88.6% with no added latency, and stacking a reranker on top made it worse. The corpus is full of proper nouns and exact amounts, where lexical matching beats a 384-dimension dense embedding.</p>
+          </li>
 
-        <div class="readout" role="list">
-          <div role="listitem"><span class="n">0<i>.</i>3207</span><span class="l">public leaderboard<br>2nd, 1st was 0.3064</span></div>
-          <div role="listitem"><span class="n">0<i>.</i>909</span><span class="l">Pearson r, out of fold<br>speaker-grouped</span></div>
-          <div role="listitem"><span class="n">0<i>.</i>516</span><span class="l">RMSE, out of fold<br>training set</span></div>
-          <div role="listitem"><span class="n">37<i>/</i>37</span><span class="l">score-0 training clips<br>caught by the gate</span></div>
-        </div>
+          <li class="dec">
+            <p class="dq">How do you keep a grammar error in the transcript?<span class="src">Spoken grammar scoring</span></p>
+            <figure>
+              <div class="plate">
+                <div class="fit"><pre id="wave" aria-hidden="true"></pre></div>
+                <dl class="diff">
+                  <dt>said</dt><dd>he <span class="hl">don't</span> like it</dd>
+                  <dt>whisper</dt><dd>he <span class="strike">doesn't</span> like it <span class="dim">  &lt;- the error is corrected away</span></dd>
+                </dl>
+              </div>
+              <figcaption><b>Fig. 2</b>  Illustrative waveform. A default speech recogniser repairs the very errors the model has to score.</figcaption>
+            </figure>
+            <ul class="opts" aria-label="Options compared">
+              <li>Default Whisper transcripts</li>
+              <li class="pick">Whisper prompted with a verbatim transcript full of fillers and mistakes</li>
+              <li class="pick">Audio models that never see a transcript (WavLM, Voxtral)</li>
+            </ul>
+            <p class="why"><b>Kept both picks.</b> The verbatim prompt keeps the speaker's errors in the text, and the audio models judge how it was said, which turned out to be the strongest signal of all.</p>
+          </li>
 
-        <div class="prose">
-          <p>Each clip is judged three ways: <strong>what was said</strong> (verbatim Whisper transcripts into DeBERTa-v3-large embeddings), <strong>how it was said</strong> (frozen WavLM and Whisper-encoder embeddings, which turned out to be the strongest signal), and <strong>what an audio language model hears</strong> (Voxtral-Mini-3B hidden states). A non-negative blend combines them, and a WavLM gate sets the clips that score zero.</p>
-        </div>
+          <li class="dec">
+            <p class="dq">Random folds or speaker-grouped folds?<span class="src">Spoken grammar scoring</span></p>
+            <ul class="opts" aria-label="Options compared">
+              <li>Random cross-validation folds</li>
+              <li class="pick">Folds grouped by speaker</li>
+            </ul>
+            <p class="why"><b>Chose speaker-grouped.</b> Clips come in speaker twins, so random folds let a model recognise the voice and report a score it cannot reproduce on new speakers.</p>
+          </li>
 
-        <figure>
-          <div class="plate">
-            <div class="fit"><pre id="lb" aria-hidden="true"></pre></div>
-          </div>
-          <figcaption><b>Fig. 2</b>  Public leaderboard by submission. Bar length is the score above 0.300, so shorter is better. The amber row is the final model. The leaderboard metric mixes RMSE with a correlation term, so it is not on the same scale as the out-of-fold RMSE.</figcaption>
-          <div class="sr-only"><table>
-            <caption>Public leaderboard score by submission</caption>
-            <thead><tr><th>Version</th><th>Change</th><th>Public score</th></tr></thead>
-            <tbody id="lb-table"></tbody>
-          </table></div>
-        </figure>
+          <li class="dec">
+            <p class="dq">L1 or L2 penalty on the pruning gates?<span class="src">Self-pruning network</span></p>
+            <ul class="opts" aria-label="Options compared">
+              <li>L2 penalty on gate values</li>
+              <li class="pick">L1 penalty on gate values, weight decay removed from the gates</li>
+            </ul>
+            <p class="why"><b>Chose L1.</b> The L2 gradient shrinks with the gate, so the push weakens exactly as a gate nears zero. Weight decay on the gates creates an equilibrium that stops them crossing the pruning threshold, so it is switched off for them.</p>
+          </li>
 
-        <div class="lessons">
-          <div>
-            <span class="tag">validation</span>
-            <h3>Speakers repeat</h3>
-            <p>Training clips come in speaker twins, so random folds let a model recognise the voice. Every fold is speaker-grouped and tuned to sit as far from training as the test set does.</p>
-          </div>
-          <div>
-            <span class="tag">distribution shift</span>
-            <h3>Test clips are shorter</h3>
-            <p>71% of test clips run 55 seconds or less, against 26% in training. Training on test-length crops was the biggest single gain: 0.3454 to 0.3350.</p>
-          </div>
-          <div>
-            <span class="tag">metric probing</span>
-            <h3>The metric is not pure RMSE</h3>
-            <p>Two probe submissions exposed a Pearson component and a test-set bias of +0.118. The predicted score after removing it was 0.3259 to 0.3264. The actual result was 0.3262.</p>
-          </div>
-        </div>
+          <li class="dec">
+            <p class="dq">Who grades the chatbot's answers?<span class="src">CollegeBot</span></p>
+            <ul class="opts" aria-label="Options compared">
+              <li>The same 8B model that wrote the answer</li>
+              <li class="pick">A stronger 70B judge, at temperature 0.0</li>
+            </ul>
+            <p class="why"><b>Chose the separate judge.</b> A model grading its own output invites self-preference bias. Temperature is pinned at 0.0 because run-to-run spread was larger than some of the improvements being measured.</p>
+          </li>
 
-        <h3 class="dropped-h">Tried and dropped</h3>
+          <li class="dec">
+            <p class="dq">A ready-made conversation chain, or a plain pipeline?<span class="src">CollegeBot</span></p>
+            <ul class="opts" aria-label="Options compared">
+              <li>LangChain ConversationalRetrievalChain</li>
+              <li class="pick">Retrieve, build the prompt, stream</li>
+            </ul>
+            <p class="why"><b>Chose the plain pipeline.</b> The chain makes two sequential model calls per follow-up on a rate-limited tier and does not stream cleanly. Prepending the previous question keeps follow-ups retrievable at no extra cost.</p>
+          </li>
+        </ol>
+
+        <h3 class="dropped-h">Tested and dropped, spoken grammar scoring</h3>
         <ul class="dropped">
           <li>Rounding to the 0.5 label grid</li>
-          <li>Stretching the short test clips (0.3408)</li>
+          <li>Stretching the short clips' predictions</li>
           <li>An LLM judge, Qwen3-8B, reading transcripts</li>
           <li>End-to-end fine-tuning of DeBERTa and WavLM</li>
           <li>Grammar-error features: T5, CoLA, GPT-2</li>
@@ -383,7 +416,6 @@ footer { border-top: 1px solid var(--rule); padding-top: 22px; padding-bottom: 4
           <li>Test-time augmentation over shifted windows</li>
           <li>Voxtral's upper layers</li>
         </ul>
-        <p class="more"><a href="https://github.com/Techy-A/shl-grammar-scoring">Read the code and full report on GitHub</a></p>
       </div>
     </section>
 
@@ -418,7 +450,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 22px; padding-bottom: 4
     <section class="sec" id="projects" aria-labelledby="proj-h">
       <header class="rail"><p class="k">Projects</p><p class="v">2025 to 2026<br>Problem, result, limit</p></header>
       <div>
-        <h2 id="proj-h">Four projects, each drawn as its pipeline</h2>
+        <h2 id="proj-h">Five projects, each drawn as its pipeline</h2>
         <ol class="projects">
           <li class="proj">
             <div>
@@ -438,6 +470,23 @@ footer { border-top: 1px solid var(--rule); padding-top: 22px; padding-bottom: 4
                         <b>Llama 3.1</b> on Groq
                                        |
                     cited answer  or  refusal</pre></div>
+          </li>
+          <li class="proj">
+            <div>
+              <h3><a href="https://github.com/Techy-A/shl-grammar-scoring">Spoken grammar scoring<span class="ext">shl-grammar-scoring</span></a></h3>
+              <dl class="case">
+                <dt>Problem</dt><dd>Predict a 0 to 5 grammar score from 45 to 60 seconds of spontaneous speech, when speech recognisers correct the errors by default.</dd>
+                <dt>Result</dt><dd>Verbatim transcripts, frozen speech encoders and an audio language model, blended. Out-of-fold Pearson r of <strong>0.909</strong> on speaker-grouped folds.</dd>
+                <dt>Limit</dt><dd>Test clips run shorter than training clips, so every model had to be retrained on test-length crops to stay calibrated.</dd>
+              </dl>
+            </div>
+            <div class="pipe fit"><pre aria-hidden="true">audio clip
+   |
+   +--&gt; <b>Whisper</b>, verbatim prompt --&gt; DeBERTa ---+
+   +--&gt; <b>WavLM</b> + Whisper encoder ----------------+--&gt; blend --&gt; 0 to 5
+   +--&gt; <b>Voxtral-Mini-3B</b> hidden states ----------+
+   |
+   +--&gt; WavLM gate --&gt; clips that score 0</pre></div>
           </li>
           <li class="proj">
             <div>
@@ -462,7 +511,7 @@ footer { border-top: 1px solid var(--rule); padding-top: 22px; padding-bottom: 4
             <div>
               <h3><a href="https://github.com/Techy-A/LORA_for_GPU">Audio LLM grammar scorer<span class="ext">LORA_for_GPU</span></a></h3>
               <dl class="case">
-                <dt>Problem</dt><dd>Fine-tune Voxtral-Mini-3B, an audio language model, to score spoken grammar on a consumer GPU, as one more model for the SHL blend.</dd>
+                <dt>Problem</dt><dd>Fine-tune Voxtral-Mini-3B, an audio language model, to score spoken grammar on a consumer GPU, as one more model for the spoken grammar blend.</dd>
                 <dt>Result</dt><dd>4-bit NF4 weights with LoRA adapters fit an <strong>8&nbsp;GB GPU</strong>. Speaker-grouped 5-fold cross-validation keeps the out-of-fold predictions honest.</dd>
                 <dt>Limit</dt><dd>A full run takes about 3 to 5 hours, and the model trains on 30-second crops, so longer test clips are scored in windows.</dd>
               </dl>
@@ -517,7 +566,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
           <li><span class="y">2025</span><span class="t" aria-hidden="true">--+--</span><span class="e">CollegeBot, an end-to-end RAG chatbot</span></li>
           <li><span class="y">2026</span><span class="t" aria-hidden="true">--+--</span><span class="e">Self-pruning neural network, Tredence case study</span></li>
           <li><span class="y"></span><span class="t" aria-hidden="true">  |--</span><span class="e">AI Research Intern at Appy Pie (Pixazo)</span></li>
-          <li class="now"><span class="y"></span><span class="t" aria-hidden="true">  |--</span><span class="e">2nd on the SHL Kaggle public leaderboard</span></li>
+          <li class="now"><span class="y"></span><span class="t" aria-hidden="true">  |--</span><span class="e">Spoken grammar scoring from audio</span></li>
           <li><span class="y">2027</span><span class="t" aria-hidden="true">--o  </span><span class="e">Graduating</span></li>
         </ol>
       </div>
@@ -538,7 +587,6 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
 
         <ul class="edu" style="margin-top:48px">
           <li><b>Thapar Institute of Engineering and Technology, Patiala</b><span>B.E. Electronics and Computer Engineering, 2023 to 2027 (expected)</span></li>
-          <li><b>Kaggle: SHL Hiring Assessment 2026</b><span>2nd on the public leaderboard, score 0.3207</span></li>
           <li><b>JEE Mains 2023</b><span>92.2 percentile</span></li>
           <li><b>Team Fateh, low voltage systems</b><span>MPU-6050 gyroscope sensor system for driver indications, PCB design and system-level debugging</span></li>
         </ul>
@@ -632,43 +680,38 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
     el.innerHTML = lines.join("\n");
   }
 
-  /* ---------- Fig. 2: leaderboard ASCII bar chart ---------- */
-  var LB = [
-    ["v1", "text + audio blend, score-0 gate", 0.3463],
-    ["v2", "+ SVR on audio embeddings", 0.3454],
-    ["v3", "+ WavLM-large, Whisper encoder", 0.3550],
-    ["v4", "SVRs trained on test-length crops", 0.3384],
-    ["v6", "all models trained on 4 crops", 0.3373],
-    ["v7", "+ text models on crop transcripts", 0.3350],
-    ["v7b", "remove measured test bias of 0.118", 0.3262],
-    ["v8", "stretch full-length clips by 1.15", 0.3241],
-    ["v9", "+ Voxtral audio LLM features", 0.3224],
-    ["final", "one Ridge over Voxtral + encoders", 0.3207]
+  /* ---------- Fig. 1: retrieval setups, ASCII bar chart ---------- */
+  var RET = [
+    ["Dense MMR, k = 6", 77.1, "none"],
+    ["BM25 only", 80.0, "none"],
+    ["Dense + cross-encoder", 88.6, "~2 s/query"],
+    ["Hybrid dense + BM25 (RRF)", 88.6, "none"],
+    ["Hybrid + cross-encoder", 85.7, "~1.4 s/query"]
   ];
+  var PICK = 3;
   function pad(s, n) { s = String(s); while (s.length < n) s += " "; return s; }
-  function buildLB() {
-    var el = document.getElementById("lb");
-    var box = el.parentNode;
-    var w = box.clientWidth;
-    var wide = w >= 640;
-    var barW = wide ? 36 : 22, lo = 0.30, hi = 0.36;
+  function buildRet() {
+    var el = document.getElementById("ret");
+    var w = el.parentNode.clientWidth;
+    var wide = w >= 600;
+    var barW = wide ? 40 : 20, nameW = wide ? 28 : 27;
     var out = [];
-    var first = Math.round((0.3064 - lo) / (hi - lo) * barW);
-    LB.forEach(function (row, i) {
-      var n = Math.round((row[2] - lo) / (hi - lo) * barW);
+    out.push('<span class="dim">' + pad("setup", nameW) + (wide ? pad("fact reaches context, 0 to 100%", barW + 9) + "added latency" : "") + "</span>");
+    out.push("");
+    RET.forEach(function (r, i) {
+      var n = Math.round(r[1] / 100 * barW);
       var bar = Array(n + 1).join("#") + Array(barW - n + 1).join(".");
-      var lbl = pad(row[0], 6) + (wide ? pad(row[1], 36) : "");
-      var line = lbl + bar + "  " + row[2].toFixed(4);
-      if (i === LB.length - 1) line = '<span class="hl">' + line + "  2nd</span>";
+      var line = wide
+        ? pad(r[0], nameW) + bar + "  " + r[1].toFixed(1) + "%  " + r[2]
+        : pad(r[0], nameW) + "\n" + bar + " " + r[1].toFixed(1) + "% " + r[2];
+      if (i === PICK) line = '<span class="hl">' + line + "  &lt;- shipped</span>";
       out.push(line);
+      if (!wide && i < RET.length - 1) out.push("");
     });
-    var axis = pad("", 6) + (wide ? pad("", 36) : "") + Array(first + 1).join(" ") + "^";
-    out.push('<span class="dim">' + axis + "</span>");
-    out.push('<span class="dim">' + pad("", 6) + (wide ? pad("", 36) : "") + Array(Math.max(first - 3, 0) + 1).join(" ") + "1st place 0.3064</span>");
     el.innerHTML = out.join("\n");
-    var tb = document.getElementById("lb-table");
+    var tb = document.getElementById("ret-table");
     if (!tb.children.length) {
-      tb.innerHTML = LB.map(function (r) { return "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td><td>" + r[2].toFixed(4) + "</td></tr>"; }).join("");
+      tb.innerHTML = RET.map(function (r) { return "<tr><td>" + r[0] + "</td><td>" + r[1].toFixed(1) + "%</td><td>" + r[2] + "</td></tr>"; }).join("");
     }
   }
 
@@ -722,12 +765,12 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
   }
 
   buildWave();
-  buildLB();
+  buildRet();
   fitAll();
   converge();
   var t;
-  window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(function () { buildWave(); buildLB(); fitAll(); }, 80); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { buildWave(); buildLB(); fitAll(); });
+  window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(function () { buildWave(); buildRet(); fitAll(); }, 80); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { buildWave(); buildRet(); fitAll(); });
 })();
 </script>
 </body>
