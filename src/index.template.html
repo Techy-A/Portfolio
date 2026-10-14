@@ -142,11 +142,17 @@ kbd { font-family: var(--mono); font-size: 11px; color: var(--ink-3); border: 1p
 .adam { padding-top: 20px; padding-bottom: 72px; }
 .adam figure { margin: 0; }
 .art { color: var(--ink); }
-.art pre { line-height: 1.2; margin: 0 auto; }
+.art pre { line-height: 1.2; margin: 0 auto; letter-spacing: 0; }
 .art .narrow { display: none; }
 @media (max-width: 640px) { .art .wide { display: none; } .art .narrow { display: block; } }
 .art.noise pre { color: var(--ink-3); }
-.spark { color: var(--ochre); text-shadow: 0 0 8px rgba(212, 176, 110, .7); animation: spark 2.4s ease-in-out infinite; }
+/* the fresco's light, from deep ochre shadow to plaster highlight */
+.art .t0 { color: #7C5A36; } .art .t1 { color: #98703F; } .art .t2 { color: #A87E50; } .art .t3 { color: #C09664; }
+.art .t4 { color: #D4AE80; } .art .t5 { color: #E4C49C; } .art .t6 { color: #F0D8B8; } .art .t7 { color: #F8ECDA; }
+.spark { position: relative; color: var(--ochre); }
+.spark::after { content: ""; position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 196, 120, .95) 0, rgba(212, 176, 110, .45) 28%, rgba(212, 176, 110, 0) 70%); animation: spark 2.4s ease-in-out infinite; pointer-events: none; }
+.art.noise .spark::after { display: none; }
 @keyframes spark { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
 .adam figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; align-items: baseline; margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--rule); font-family: var(--mono); font-size: 11px; color: var(--ink-3); line-height: 1.6; }
 .adam figcaption b { color: var(--ink-2); font-weight: 500; }
@@ -316,12 +322,12 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .6); }
 
     <section class="adam" aria-label="The Creation of Adam, the hands, in ASCII">
       <figure>
-        <div class="art fit" role="img" aria-label="Two hands reaching toward each other, God's index finger and Adam's almost touching, drawn in ASCII characters.">
-          <pre class="wide" data-spark="{{SPARK_WIDE}}">{{HANDS_WIDE}}</pre>
-          <pre class="narrow" data-spark="{{SPARK_NARROW}}">{{HANDS_NARROW}}</pre>
+        <div class="art fit" role="img" aria-label="The hands of God and Adam from Michelangelo's fresco, their index fingers almost touching, rendered in ASCII characters.">
+          <pre class="wide">{{HANDS_WIDE}}</pre>
+          <pre class="narrow">{{HANDS_NARROW}}</pre>
         </div>
         <figcaption>
-          <p><b>Fig. 0</b>  The hands from Michelangelo's <i>The Creation of Adam</i>, c. 1512, redrawn as {{HANDS_COUNT}} ASCII characters. On load the drawing is denoised from random characters in 40 steps, the way a diffusion model samples an image.</p>
+          <p><b>Fig. 0</b>  The hands from Michelangelo's <i>The Creation of Adam</i>, c. 1512, rendered from a public-domain scan of the fresco as {{HANDS_COUNT}} ASCII characters, each coloured by the light falling on it. On load it is denoised from random characters in 40 steps, the way a diffusion model samples an image.</p>
           <span class="sample"><output id="tstep" aria-live="off">t = 0</output><button type="button" id="resample">Sample again</button></span>
         </figcaption>
       </figure>
@@ -599,7 +605,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
 
   <footer>
     <span>Aryan Awasthi, 2026</span>
-    <span>Set in Cormorant Garamond, Geist, Geist Mono and Doto. The hands are modelled and drawn by a script in this site's repository, not traced from an image. A plain-text summary for AI assistants is at <a href="llms.txt">llms.txt</a>.</span>
+    <span>Set in Cormorant Garamond, Geist, Geist Mono and Doto. The hands are rendered from a public-domain scan of the fresco by a script in this site's repository. A plain-text summary for AI assistants is at <a href="llms.txt">llms.txt</a>.</span>
   </footer>
 </div>
 

@@ -7,8 +7,11 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-hands = json.loads((ROOT / "src" / "hands.json").read_text())["wide"]
-art = html.escape("\n".join(hands["lines"]), quote=False)
+import sys
+sys.path.insert(0, str(ROOT / "src"))
+from build import to_html  # noqa: E402
+
+art = to_html(json.loads((ROOT / "src" / "fresco.json").read_text())["wide"])
 
 page = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -23,7 +26,10 @@ body {{ width: 1200px; height: 627px; box-sizing: border-box; padding: 44px 64px
 .name i {{ font-weight: 400; color: #ABA59C; }}
 .tag {{ font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: #ABA59C; }}
 .tag span {{ color: #D4B06E; }}
-pre {{ margin: 0; font-family: "Geist Mono", monospace; font-size: 11.6px; line-height: 1.2; color: #ECE8E1; }}
+pre {{ margin: 0 auto; font-family: "Geist Mono", monospace; font-size: 6.25px; line-height: 1.2; color: #ECE8E1; }}
+.t0 {{ color: #7C5A36; }} .t1 {{ color: #98703F; }} .t2 {{ color: #A87E50; }} .t3 {{ color: #C09664; }}
+.t4 {{ color: #D4AE80; }} .t5 {{ color: #E4C49C; }} .t6 {{ color: #F0D8B8; }} .t7 {{ color: #F8ECDA; }}
+.spark {{ color: #D4B06E; }}
 .bottom {{ display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid #242322; padding-top: 18px; }}
 .lead {{ font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 32px; margin: 0; }}
 .lead em {{ color: #D4B06E; }}
@@ -31,7 +37,7 @@ pre {{ margin: 0; font-family: "Geist Mono", monospace; font-size: 11.6px; line-
 </style></head><body>
 <div class="top"><p class="name">Aryan <i>Awasthi</i></p><p class="tag">ML <span>/</span> AI <span>/</span> Data science</p></div>
 <pre>{art}</pre>
-<div class="bottom"><p class="lead">I try every reasonable answer, then <em>prove</em> which one is better.</p><p class="fig">after Michelangelo, in ASCII</p></div>
+<div class="bottom"><p class="lead">I try every reasonable answer, then <em>prove</em> which one is better.</p><p class="fig">after Michelangelo, c. 1512, in ASCII</p></div>
 </body></html>
 """
 (ROOT / "src" / "og.html").write_text(page, encoding="utf-8")

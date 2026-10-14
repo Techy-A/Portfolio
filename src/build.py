@@ -1,7 +1,7 @@
 """Render index.html from the template, injecting the ASCII hands.
 
-Usage: pip install numpy scipy pillow && python src/hands.py && python src/build.py
-(hands.py only needs to run again when the drawing changes; src/hands.json is committed.)
+Usage: python src/build.py
+(src/fresco.json is committed; regenerate it with src/fresco.py only if the rendering changes.)
 """
 import html
 import json
@@ -13,35 +13,43 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://techy-a.github.io/portfolio/"
 
 
-def with_spark(art):
-    """Escape the drawing and put a spark in the gap between the two fingertips."""
-    lines = [list(l) for l in art["lines"]]
-    (ar, ac), (gr, gc) = art["adam_tip"], art["god_tip"]
-    r, c = round((ar + gr) / 2), round((ac + gc) / 2)
-    while len(lines[r]) <= c:
-        lines[r].append(" ")
-    assert lines[r][c] == " ", "the spark must sit in empty space"
+def to_html(art):
+    """Escape the drawing, group characters by tint into spans, and set the spark."""
+    sr, sc = art["spark"]
     out = []
-    for i, row in enumerate(lines):
-        if i == r:
-            out.append(html.escape("".join(row[:c]), quote=False) + '<span class="spark">*</span>'
-                       + html.escape("".join(row[c + 1:]), quote=False))
-        else:
-            out.append(html.escape("".join(row), quote=False))
-    return "\n".join(out), f"{r},{c}"
+    for r, (line, tints) in enumerate(zip(art["lines"], art["tints"])):
+        if r == sr:
+            line = line.ljust(sc + 1)
+            tints = tints + [-1] * (len(line) - len(tints))
+            assert line[sc] == " ", "the spark must sit in the gap between the fingertips"
+        row, c = [], 0
+        while c < len(line):
+            if r == sr and c == sc:
+                row.append('<span class="spark">*</span>')
+                c += 1
+                continue
+            tint, s = tints[c], c
+            while c < len(line) and tints[c] == tint and not (r == sr and c == sc):
+                c += 1
+            chunk = html.escape(line[s:c], quote=False)
+            row.append(chunk if tint < 0 or not chunk.strip() else f'<span class="t{tint}">{chunk}</span>')
+        out.append("".join(row))
+    return "\n".join(out)
 
 
-hands = json.loads((ROOT / "src" / "hands.json").read_text())
-page = (ROOT / "src" / "index.template.html").read_text(encoding="utf-8")
-wide, spark_wide = with_spark(hands["wide"])
-narrow, spark_narrow = with_spark(hands["narrow"])
-count = sum(len(l.replace(" ", "")) for l in hands["wide"]["lines"])
-for key, value in {
-    "HANDS_WIDE": wide, "HANDS_NARROW": narrow,
-    "SPARK_WIDE": spark_wide, "SPARK_NARROW": spark_narrow,
-    "HANDS_COUNT": f"{count:,}", "SITE": SITE,
-}.items():
-    page = page.replace("{{" + key + "}}", value)
-assert "{{" not in page
-(ROOT / "index.html").write_text(page, encoding="utf-8")
-print("wrote index.html,", count, "characters in the hands")
+def main():
+    art = json.loads((ROOT / "src" / "fresco.json").read_text())
+    page = (ROOT / "src" / "index.template.html").read_text(encoding="utf-8")
+    count = sum(len(l.replace(" ", "")) for l in art["wide"]["lines"])
+    for key, value in {
+        "HANDS_WIDE": to_html(art["wide"]), "HANDS_NARROW": to_html(art["narrow"]),
+        "HANDS_COUNT": f"{count:,}", "SITE": SITE,
+    }.items():
+        page = page.replace("{{" + key + "}}", value)
+    assert "{{" not in page
+    (ROOT / "index.html").write_text(page, encoding="utf-8")
+    print("wrote index.html,", count, "characters in the hands")
+
+
+if __name__ == "__main__":
+    main()
