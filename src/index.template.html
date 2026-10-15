@@ -146,21 +146,25 @@ kbd { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
   .card dl > div:first-child { border-top: 0; }
 }
 
-/* the hands */
+/* the hands: the reference image, its black made transparent on a canvas */
 .adam { padding-top: 28px; padding-bottom: 64px; }
 .adam figure { margin: 0; }
-.art { color: var(--ink); }
-.art pre { line-height: 1.2; letter-spacing: 0; }
-.art .narrow { display: none; }
-@media (max-width: 640px) { .art .wide { display: none; } .art .narrow { display: inline-block; } }
-.art.noise pre { color: var(--ink-3); }
-/* the fresco's light, from deep ochre shadow to plaster highlight */
-.art .t0 { color: #7C5A36; } .art .t1 { color: #98703F; } .art .t2 { color: #A87E50; } .art .t3 { color: #C09664; }
-.art .t4 { color: #D4AE80; } .art .t5 { color: #E4C49C; } .art .t6 { color: #F0D8B8; } .art .t7 { color: #F8ECDA; }
-.spark { position: relative; color: var(--ochre); }
-.spark::after { content: ""; position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; transform: translate(-50%, -50%); border-radius: 50%;
-  background: radial-gradient(circle, rgba(232, 196, 120, .95) 0, rgba(212, 176, 110, .45) 28%, rgba(212, 176, 110, 0) 70%); animation: spark 2.4s ease-in-out infinite; pointer-events: none; }
-.art.noise .spark::after { display: none; }
+.art { position: relative; margin: 0 auto; max-width: 980px; aspect-ratio: 736 / 316; overflow: hidden;
+  --cx: 0; --cy: 44; --cw: 736; --ch: 316;
+  /* the forearms dissolve into the black instead of stopping at the image edge */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 12%, #000 88%, transparent 100%); }
+.stage { position: absolute; left: calc(var(--cx) / var(--cw) * -100%); top: calc(var(--cy) / var(--ch) * -100%);
+  width: calc(736 / var(--cw) * 100%); height: calc(414 / var(--ch) * 100%); }
+.stage img, .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage img { mix-blend-mode: lighten; }
+.art.live .stage img { visibility: hidden; }
+/* phones: crop in on the two hands and the gap between them */
+@media (max-width: 640px) { .art { aspect-ratio: 560 / 300; --cx: 140; --cy: 52; --cw: 560; --ch: 300; } }
+.spark { position: absolute; left: 51.49%; top: 50.72%;   /* the fingertip gap, as fractions of the full image (379, 210 of 736 x 414) */ width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #F3DDA8; }
+.spark::after { content: ""; position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 196, 120, .9) 0, rgba(212, 176, 110, .4) 30%, rgba(212, 176, 110, 0) 70%); animation: spark 2.4s ease-in-out infinite; }
+.art.noise .spark { opacity: 0; }
 @keyframes spark { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
 .adam figcaption { margin: 22px auto 0; max-width: 62ch; text-align: center; font-size: 16px; color: var(--ink-3); line-height: 1.55; }
 .adam figcaption b { color: var(--ink-2); font-weight: 400; font-variant: small-caps; letter-spacing: .1em; }
@@ -330,12 +334,15 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .6); }
 
     <section class="adam" aria-label="The Creation of Adam, the hands, in ASCII">
       <figure>
-        <div class="art fit" role="img" aria-label="The hands of God and Adam from Michelangelo's fresco, their index fingers almost touching, rendered in ASCII characters.">
-          <pre class="wide">{{HANDS_WIDE}}</pre>
-          <pre class="narrow">{{HANDS_NARROW}}</pre>
+        <div class="art" role="img" aria-label="The hands of God and Adam from Michelangelo's fresco, their index fingers almost touching, in ASCII characters.">
+          <div class="stage">
+            <img src="adam.jpg" alt="" width="736" height="414" decoding="async">
+            <canvas id="adam-canvas" width="736" height="414" aria-hidden="true"></canvas>
+            <span class="spark" aria-hidden="true"></span>
+          </div>
         </div>
         <figcaption>
-          <p><b>Fig. 0</b>  The hands from Michelangelo's <i>The Creation of Adam</i>, c. 1512, rendered from a public-domain scan of the fresco as {{HANDS_COUNT}} ASCII characters, each coloured by the light falling on it. On load it is denoised from random characters in 40 steps, the way a diffusion model samples an image.</p>
+          <p><b>Fig. 0</b>  The hands from Michelangelo's <i>The Creation of Adam</i>, c. 1512, in ASCII. On load the picture is denoised from random noise in 40 steps, the way a diffusion model samples an image.</p>
           <span class="sample"><output id="tstep" aria-live="off">t = 0</output><button type="button" id="resample">Sample again</button></span>
         </figcaption>
       </figure>
@@ -614,7 +621,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
   <footer>
     <p class="orn" aria-hidden="true">~ * ~</p>
     <p>Aryan Awasthi, 2026</p>
-    <p>Set in Times New Roman, with Courier Prime for the ASCII. The hands are rendered from a public-domain scan of the fresco by a script in this site's repository. A plain-text summary for AI assistants is at <a href="llms.txt">llms.txt</a>.</p>
+    <p>Set in Times New Roman, with Courier Prime for the ASCII. The hands are an ASCII rendering of Michelangelo's fresco. A plain-text summary for AI assistants is at <a href="llms.txt">llms.txt</a>.</p>
   </footer>
 </div>
 
@@ -732,7 +739,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
       var L = pres.reduce(function (m, p) { return Math.max(m, longest(p)); }, 0) + 2;
       var cs = getComputedStyle(box);
       var w = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-      var isName = box.classList.contains("art"), isPipe = box.classList.contains("pipe");
+      var isName = false, isPipe = box.classList.contains("pipe");
       var max = isName ? 14 : (isPipe ? 12 : 13.5);
       var size = Math.min(max, w / (L * r));
       if (!isName) size = Math.max(size, 9);
@@ -745,20 +752,36 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
     });
   }
 
-  /* ---------- the hands: a 40-step denoising sampler ---------- */
-  var NOISE = ".,:;-=+*#%@";
+  /* ---------- the hands: a 40-step denoising sampler on a canvas ---------- */
   var STEPS = 40;
   var tOut = document.getElementById("tstep");
   var artBox = document.querySelector(".art");
-  var arts = Array.prototype.map.call(document.querySelectorAll(".art pre"), function (pre) {
-    return { pre: pre, html: pre.innerHTML, text: pre.textContent };
-  });
-  var running = 0;
+  var cvs = document.getElementById("adam-canvas");
+  var ctx = cvs.getContext && cvs.getContext("2d");
+  var img = artBox.querySelector("img");
+  var clean = null, running = 0;
+  function prepare() {
+    // black becomes transparent: each pixel keeps its colour, with alpha from its brightness,
+    // so the picture sits on the page's matte black and its grain instead of a black box
+    ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
+    var d = ctx.getImageData(0, 0, cvs.width, cvs.height), p = d.data;
+    for (var i = 0; i < p.length; i += 4) {
+      var a = Math.max(p[i], p[i + 1], p[i + 2]);
+      if (a < 14) { p[i + 3] = 0; continue; }
+      var k = 255 / a;
+      p[i] = Math.min(255, p[i] * k * 0.96); p[i + 1] = Math.min(255, p[i + 1] * k * 0.95); p[i + 2] = Math.min(255, p[i + 2] * k * 0.92);
+      p[i + 3] = Math.min(255, a * 1.25);
+    }
+    clean = d;
+    ctx.putImageData(clean, 0, 0);
+    artBox.classList.add("live");
+  }
   function sample() {
-    if (reduce) return;
+    if (reduce || !clean) return;
     var id = ++running;
-    var seed = (Math.random() * 4294967296) >>> 0;
-    var rnd = rng(seed);
+    var rnd = rng((Math.random() * 4294967296) >>> 0);
+    var w = cvs.width, h = cvs.height, frameData = ctx.createImageData(w, h);
+    var src = clean.data, out = frameData.data;
     var step = STEPS, last = 0;
     artBox.classList.add("noise");
     function frame(ts) {
@@ -766,25 +789,35 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
       if (ts - last < 32) { requestAnimationFrame(frame); return; }
       last = ts;
       var sigma = Math.pow(step / STEPS, 1.6);
-      arts.forEach(function (a) {
-        if (a.pre.offsetParent === null) return;
-        var out = "", src = a.text;
-        for (var i = 0; i < src.length; i++) {
-          var ch = src.charAt(i);
-          if (ch === "\n") { out += ch; continue; }
-          var keep = ch === " " ? sigma * 0.55 : sigma;
-          out += rnd() < keep ? NOISE.charAt((rnd() * NOISE.length * (0.35 + 0.65 * sigma)) | 0) : ch;
+      // noise in 2 x 3 px blocks, about one character cell of the picture
+      for (var y = 0; y < h; y += 3) {
+        for (var x = 0; x < w; x += 2) {
+          var noisy = rnd() < sigma, n = rnd() * 170 * sigma;
+          for (var yy = y; yy < y + 3 && yy < h; yy++) {
+            for (var xx = x; xx < x + 2 && xx < w; xx++) {
+              var i = (yy * w + xx) * 4;
+              out[i] = src[i]; out[i + 1] = src[i + 1]; out[i + 2] = src[i + 2];
+              out[i + 3] = noisy ? n : src[i + 3];
+              if (noisy) { out[i] = out[i + 1] = out[i + 2] = 236; }
+            }
+          }
         }
-        a.pre.textContent = out;
-      });
+      }
+      ctx.putImageData(frameData, 0, 0);
       tOut.textContent = "t = " + step;
       if (step-- > 0) { requestAnimationFrame(frame); return; }
-      arts.forEach(function (a) { a.pre.innerHTML = a.html; });
+      ctx.putImageData(clean, 0, 0);
       artBox.classList.remove("noise");
       tOut.textContent = "t = 0";
     }
     requestAnimationFrame(frame);
   }
+  function start() {
+    if (!ctx) return;
+    try { prepare(); } catch (err) { return; }      // a canvas that cannot be read keeps the plain image
+    sample();
+  }
+  if (img.complete && img.naturalWidth) start(); else img.addEventListener("load", start);
   document.getElementById("resample").addEventListener("click", function () {
     if (reduce) { toast("Animation is off because reduced motion is on"); return; }
     sample();
@@ -855,7 +888,6 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
   buildWave();
   buildRet();
   fitAll();
-  sample();
   var t;
   window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(function () { buildWave(); buildRet(); fitAll(); }, 80); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { buildWave(); buildRet(); fitAll(); });

@@ -19,9 +19,9 @@ A single static page with no framework and no build step at runtime.
 | Path | What it is |
 |:--|:--|
 | `index.html` | The site. Open it in a browser, or serve the repo root with GitHub Pages. |
-| `src/index.template.html` | Source for `index.html`, with placeholders for the ASCII hands. |
-| `src/fresco.py` | Renders the hands from a public-domain scan of The Creation of Adam as tonal ASCII. Writes `src/fresco.json`. |
-| `src/build.py` | Puts the hands, their colours and the spark into the template and writes `index.html`. |
+| `src/index.template.html` | Source for `index.html`. |
+| `src/build.py` | Fills in the site address and writes `index.html`. |
+| `adam.jpg` | The ASCII rendering of the hands from The Creation of Adam shown below the introduction. |
 | `src/og.py`, `src/og.html` | Source for `og.png`, the 1200 x 627 link preview. Screenshot `og.html` at that size to regenerate. |
 | `llms.txt` | Plain-text summary of the page for AI assistants. |
 | `AryanAwasthi.pdf` | Resume, linked from the page. |
@@ -34,23 +34,17 @@ Change copy and styles in `src/index.template.html`, then rebuild:
 python src/build.py
 ```
 
-To re-render the hands (only needed if the rendering changes):
-
-```bash
-pip install numpy scipy pillow
-curl -L -o adam.jpg "https://upload.wikimedia.org/wikipedia/commons/5/5b/Michelangelo_-_Creation_of_Adam_%28cropped%29.jpg"
-python src/fresco.py adam.jpg && python src/og.py && python src/build.py
-```
+To redo the link preview after a change, run `python src/og.py` and screenshot `src/og.html` at 1200 x 627 as `og.png`.
 
 ## Design notes
 
 - Matte black with a fine grain. Three muted accents carry meaning: ochre for emphasis and the spark, sage for what was chosen or shipped, rose for what was tested and dropped.
 - Set entirely in Times New Roman (Tinos as the fallback where it is not installed), with small capitals for labels and italics for asides. Courier Prime, its typewriter partner, sets the ASCII. Every heading, label and short paragraph sits on one centre axis, like a printed title page.
-- The hands come from a public-domain scan of the fresco, with a short stretch of each forearm. Skin is told apart from the plaster by saturation plus darkness, keeping only regions with a clearly skin-coloured core, so stains in the plaster drop out. Adam's fingers overlap in shadow, so the seams between them are traced by hand on the fresco (`SEAMS` in `src/fresco.py`) and cut as clean one-character channels, together with the plaster seen between his fingers. Skin keeps a minimum character density and each character is coloured by the light on it, from deep ochre to plaster white, so shaded fingers stay solid. Phones get a tighter crop on the fingertips. The arm ends dissolve into fine dust, and a glowing spark sits in the gap between the fingertips.
-- On load the hands are denoised from random characters in 40 steps, like a diffusion sampler. "Sample again" reruns it. Reduced motion shows the finished image.
+- The hands are `adam.jpg`, an ASCII rendering of the hands from The Creation of Adam. A canvas turns its black into transparency, so the characters sit directly on the page's matte black and grain, and the forearms fade out at the left and right edges. Phones get a tighter crop on the two hands and the gap between them. A glowing spark sits in the gap between the fingertips.
+- On load the picture is denoised from random noise in 40 steps, like a diffusion sampler. "Sample again" reruns it. Reduced motion shows the finished image, and if the canvas is unavailable the plain image is shown.
 - Ctrl K, Cmd K or / opens a jump menu: sections, resume, copy email, GitHub, LinkedIn.
 - The first screen is a centred title page with what a recruiter scans for: name, headline, resume, email, LinkedIn and GitHub, and an at-a-glance table (role sought, latest role and dates, education, location, stack, contact).
-- House style: no em dashes, no en dashes, no emoji. Every file is plain 7-bit ASCII.
+- House style: no em dashes, no en dashes, no emoji. Every text file is plain 7-bit ASCII.
 
 ## Publishing
 
