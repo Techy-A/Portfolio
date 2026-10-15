@@ -21,7 +21,7 @@ A single static page with no framework and no build step at runtime.
 | `index.html` | The site. Open it in a browser, or serve the repo root with GitHub Pages. |
 | `src/index.template.html` | Source for `index.html`. |
 | `src/build.py` | Fills in the site address and writes `index.html`. |
-| `adam.jpg` | The ASCII rendering of the hands from The Creation of Adam shown below the introduction. |
+| `adam.jpg` | ASCII rendering of the hands from The Creation of Adam, shown below the introduction. Found on Pinterest; the original artist is unknown, so it is credited that way on the page. |
 | `src/og.py`, `src/og.html` | Source for `og.png`, the 1200 x 627 link preview. Screenshot `og.html` at that size to regenerate. |
 | `llms.txt` | Plain-text summary of the page for AI assistants. |
 | `AryanAwasthi.pdf` | Resume, linked from the page. |
@@ -51,4 +51,4 @@ To redo the link preview after a change, run `python src/og.py` and screenshot `
 `SITE` in `src/build.py` is the public address used for the link preview and search metadata. It defaults to `https://techy-a.github.io/portfolio/`; change it and rebuild if the site lives elsewhere.
 
 
-Settings, Pages, deploy from branch `main`, folder `/ (root)`. Pages on a private repository needs a paid GitHub plan; on a free plan, make the repository public first.
+Settings, Pages, deploy from branch `main`, folder `/ (root)`. The repository is public, so GitHub Pages works on the free plan.
