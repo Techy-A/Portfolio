@@ -48,7 +48,7 @@ To redo the link preview after a change, run `python src/og.py` and screenshot `
 
 ## Publishing
 
-`SITE` in `src/build.py` is the public address used for the link preview and search metadata. It defaults to `https://techy-a.github.io/portfolio/`; change it and rebuild if the site lives elsewhere.
+`SITE` in `src/build.py` is the public address used for the link preview and search metadata. It defaults to `https://aryanawasthi.vercel.app/`; change it and rebuild if the site lives elsewhere.
 
 
-Settings, Pages, deploy from branch `main`, folder `/ (root)`. The repository is public, so GitHub Pages works on the free plan.
+Deployed on Vercel at https://aryanawasthi.vercel.app/ (Hobby plan, no build step, output directory is the repo root). Every push to `main` redeploys.

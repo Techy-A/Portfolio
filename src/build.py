@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 # Public address of the site. Link previews need absolute URLs, so change this
 # if the site is served from somewhere else (a custom domain, another repo name).
-SITE = "https://techy-a.github.io/portfolio/"
+SITE = "https://aryanawasthi.vercel.app/"
 
 
 def main():
