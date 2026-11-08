@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://aryanawasthi.vercel.app/"><img src="./og.png" width="100%" alt="Portfolio of Aryan Awasthi: machine learning, model evaluation and data. Open the live site."></a>
+</p>
+
+<p align="center"><a href="https://aryanawasthi.vercel.app/"><b>Open the live site</b></a></p>
+
 # Portfolio
 
 Personal portfolio of Aryan Awasthi: machine learning, model evaluation and data.
