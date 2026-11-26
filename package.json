@@ -1,0 +1,14 @@
+{
+  "name": "aryan-awasthi-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "python3 src/build.py",
+    "check": "python3 scripts/check.py",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.11.0",
+    "@playwright/test": "1.63.0"
+  }
+}

@@ -30,7 +30,7 @@
   "address": { "@type": "PostalAddress", "addressLocality": "New Delhi", "addressCountry": "IN" },
   "affiliation": { "@type": "CollegeOrUniversity", "name": "Thapar Institute of Engineering and Technology" },
   "knowsAbout": ["Machine learning", "Model evaluation", "Speech and audio ML", "Retrieval-augmented generation", "Statistics"],
-  "sameAs": ["https://github.com/Techy-A", "https://www.linkedin.com/in/aryan--awasthi"]
+  "sameAs": ["https://github.com/Techy-A", "https://www.linkedin.com/in/aryan--awasthi", "https://www.kaggle.com/aryanawasthiteykik"]
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -321,7 +321,7 @@ figure { margin: 22px 0; }
 /* contact */
 .contact h2 { font-size: clamp(36px, 6vw, 76px); max-width: 16ch; }
 .contact pre { font-size: 15px; color: var(--ink-3); }
-.contact pre a { color: var(--accent); text-decoration: none; }
+.contact pre a { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
 .contact pre a:hover { text-decoration: underline; }
 .contact .actions { justify-content: flex-start; margin-top: 28px; }
 .contact .links { justify-content: flex-start; }
@@ -384,14 +384,14 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
       <div class="hero-copy">
         <p class="pill"><span class="dot" aria-hidden="true"></span>Open to ML and data roles</p>
         <h1 id="hero-name" class="name">Aryan Awasthi</h1>
-        <p class="tagline" aria-label="The limit of effort of n, as n goes to infinity, equals still going."><span class="lim" aria-hidden="true">lim<sub>n&nbsp;&rarr;&nbsp;&infin;</sub></span><code aria-hidden="true"> effort(n) = <em>still going</em></code><span class="caret" aria-hidden="true"></span></p>
+        <p class="tagline"><span class="sr-only">The limit of effort of n, as n goes to infinity, equals still going.</span><span class="lim" aria-hidden="true">lim<sub>n&nbsp;&rarr;&nbsp;&infin;</sub></span><code aria-hidden="true"> effort(n) = <em>still going</em></code><span class="caret" aria-hidden="true"></span></p>
         <p class="lead">I try every reasonable answer, then prove which one is better.</p>
         <p class="sub">Machine learning and data student at Thapar Institute. Most recently an <strong>AI Research Intern on model evaluation</strong> at Appy Pie (Pixazo), where I ranked 15 models over 1,050 match-ups with Elo, Bradley-Terry and bootstrap confidence intervals.</p>
         <div class="actions">
           <a class="btn primary" href="AryanAwasthi.pdf">Resume (PDF)</a>
           <a class="btn" href="mailto:aryanawasthi017@gmail.com">Email me</a>
         </div>
-        <p class="links"><a href="https://www.linkedin.com/in/aryan--awasthi">LinkedIn</a><span aria-hidden="true">/</span><a href="https://github.com/Techy-A">GitHub</a></p>
+        <p class="links"><a href="https://www.linkedin.com/in/aryan--awasthi">LinkedIn</a><span aria-hidden="true">/</span><a href="https://github.com/Techy-A">GitHub</a><span aria-hidden="true">/</span><a href="https://www.kaggle.com/aryanawasthiteykik">Kaggle</a></p>
         <p class="sample"><span>The hands are denoised from noise in 40 steps, like a diffusion sampler.</span><output id="tstep" aria-live="off">t = 0</output><button type="button" id="resample">Sample again</button></p>
       </div>
 
@@ -688,7 +688,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
           <a class="btn primary" href="AryanAwasthi.pdf">Resume (PDF)</a>
           <a class="btn" href="mailto:aryanawasthi017@gmail.com">Email me</a>
         </div>
-        <p class="links"><a href="https://www.linkedin.com/in/aryan--awasthi">LinkedIn</a><span aria-hidden="true">/</span><a href="https://github.com/Techy-A">GitHub</a></p>
+        <p class="links"><a href="https://www.linkedin.com/in/aryan--awasthi">LinkedIn</a><span aria-hidden="true">/</span><a href="https://github.com/Techy-A">GitHub</a><span aria-hidden="true">/</span><a href="https://www.kaggle.com/aryanawasthiteykik">Kaggle</a></p>
       </div>
     </section>
   </main>
@@ -834,27 +834,27 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
   var cvs = document.getElementById("adam-canvas");
   var ctx = cvs.getContext && cvs.getContext("2d");
   var img = artBox.querySelector("img");
-  var clean = null, running = 0, inkRGB = [236, 233, 227];
-  function readInk() {
-    // the theme's ink colour as RGB, read through a 1 px canvas so oklch() works too
-    var c = document.createElement("canvas"); c.width = c.height = 1;
-    var x = c.getContext("2d"); x.fillStyle = getComputedStyle(document.body).color; x.fillRect(0, 0, 1, 1);
-    var d = x.getImageData(0, 0, 1, 1).data; inkRGB = [d[0], d[1], d[2]];
-  }
+  var clean = null, running = 0, alpha = null;
+  // fixed ink per theme (never read mid-transition): plaster white on charcoal, near-black on stone
+  var INK = { dark: [236, 233, 227], light: [20, 20, 24] };
+  function ink() { return INK[document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark"]; }
   function prepare() {
-    readInk();
-    // black becomes transparent: each pixel keeps its colour, with alpha from its brightness,
-    // so the picture sits on the page's matte black and its grain instead of a black box
-    ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
-    var d = ctx.getImageData(0, 0, cvs.width, cvs.height), p = d.data;
-    for (var i = 0; i < p.length; i += 4) {
-      var a = Math.max(p[i], p[i + 1], p[i + 2]);
-      if (a < 14) { p[i + 3] = 0; continue; }
-      // every character takes the theme's ink colour; its brightness becomes opacity
-      p[i] = inkRGB[0]; p[i + 1] = inkRGB[1]; p[i + 2] = inkRGB[2];
-      p[i + 3] = Math.min(255, a * 1.3);
+    // read the picture once: each pixel's brightness becomes the opacity of one ink colour
+    if (!alpha) {
+      ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
+      var src = ctx.getImageData(0, 0, cvs.width, cvs.height).data;
+      alpha = new Uint8ClampedArray(src.length / 4);
+      for (var j = 0, i = 0; i < src.length; i += 4, j++) {
+        var a = Math.max(src[i], src[i + 1], src[i + 2]);
+        alpha[j] = a < 14 ? 0 : Math.min(255, a * 1.3);
+      }
+    }
+    var c = ink(), d = ctx.createImageData(cvs.width, cvs.height), p = d.data;
+    for (var k = 0, n = 0; n < alpha.length; n++, k += 4) {
+      p[k] = c[0]; p[k + 1] = c[1]; p[k + 2] = c[2]; p[k + 3] = alpha[n];
     }
     clean = d;
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
     ctx.putImageData(clean, 0, 0);
     artBox.classList.add("live");
   }
@@ -863,7 +863,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
     var id = ++running;
     var rnd = rng((Math.random() * 4294967296) >>> 0);
     var w = cvs.width, h = cvs.height, frameData = ctx.createImageData(w, h);
-    var src = clean.data, out = frameData.data;
+    var src = clean.data, out = frameData.data, inkRGB = ink();
     var step = STEPS, last = 0;
     artBox.classList.add("noise");
     function frame(ts) {
@@ -937,6 +937,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
     ["Open resume (PDF)", "link", openLink("AryanAwasthi.pdf")],
     ["Copy email address", "action", copyEmail],
     ["Open GitHub", "link", openLink("https://github.com/Techy-A")],
+    ["Open Kaggle", "link", openLink("https://www.kaggle.com/aryanawasthiteykik")],
     ["Open LinkedIn", "link", openLink("https://www.linkedin.com/in/aryan--awasthi")],
     ["Sample the hands again", "action", function () { go("top")(); sample(); }],
     ["Switch theme", "action", function () { themeBtn.click(); }]

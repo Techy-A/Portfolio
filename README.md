@@ -36,13 +36,23 @@ A single static page with no framework and no build step at runtime.
 
 ## Editing
 
-Change copy and styles in `src/index.template.html`, then rebuild:
+Change copy and styles in `src/index.template.html`, then rebuild and check:
 
 ```bash
-python src/build.py
+python3 src/build.py        # writes index.html
+python3 scripts/check.py    # build current, ASCII only, local files exist, no rank claims
+npm ci && npm test          # Playwright: phone and desktop, both themes, axe accessibility, theme toggle
 ```
 
-To redo the link preview after a change, run `python src/og.py` and screenshot `src/og.html` at 1200 x 627 as `og.png`.
+To redo the link preview, run `python3 src/og.py` and screenshot `src/og.html` at 1200 x 627 as `og.png`.
+
+## Pipeline
+
+- **CI** (`.github/workflows/ci.yml`): on every push and pull request, runs the static checks, then the
+  Playwright and axe-core tests in Chromium. A red check means the change broke the page; fix before merging.
+- **Deploy**: Vercel builds nothing (`vercel.json`: output is the repo root) and redeploys on every push to
+  `main`. It also sets security headers and long cache lifetimes for fonts and images.
+- **Analytics**: Vercel Web Analytics, enabled in the Vercel project's Analytics tab.
 
 ## Design notes
 

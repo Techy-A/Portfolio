@@ -9,25 +9,34 @@ ROOT = Path(__file__).resolve().parent.parent
 page = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <title>Link preview card</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..600&family=Space+Mono&display=swap" rel="stylesheet">
 <style>
+@font-face { font-family: "Clash Display"; src: url("../fonts/ClashDisplay-500.woff2") format("woff2"); font-weight: 500; }
 html, body { margin: 0; }
-body { width: 1200px; height: 627px; box-sizing: border-box; padding: 40px 64px 36px; background: #0F1013; color: #ECE9E3;
-  display: flex; flex-direction: column; align-items: center; justify-content: space-between; overflow: hidden;
-  font-family: "Space Grotesk", sans-serif; text-align: center; }
-.tag { margin: 0; font: 14px "Space Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: #B0ACA4; }
-.tag span { color: #D9B26F; }
-.name { margin: 6px 0 0; font-size: 84px; line-height: 1; font-weight: 500; letter-spacing: -.045em; }
-img { width: 660px; height: auto; display: block; mix-blend-mode: lighten; }
-.lead { margin: 0; font: 34px "Space Mono", monospace; letter-spacing: -.03em; color: #ECE9E3; }
+body { width: 1200px; height: 627px; box-sizing: border-box; padding: 52px 64px 44px; background: #0F1013; color: #ECE9E3;
+  display: grid; grid-template-columns: 1fr 300px; grid-template-rows: auto 1fr auto; column-gap: 56px; overflow: hidden;
+  font-family: "Bricolage Grotesque", sans-serif; }
+.tag { grid-column: 1; margin: 0; font: 15px "Space Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: #B0ACA4; display: flex; align-items: center; gap: 10px; }
+.tag i { width: 9px; height: 9px; border-radius: 50%; background: #9DC4AF; }
+.name { grid-column: 1; margin: 22px 0 0; font: 500 98px/0.95 "Clash Display", sans-serif; letter-spacing: -.025em; word-spacing: .06em; }
+.lead { grid-column: 1; align-self: end; margin: 0; font: 31px "Space Mono", monospace; letter-spacing: -.03em; color: #ECE9E3; }
 .lead code { font: inherit; }
 .lim { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; margin-right: .15em; }
 .lim sub { font-size: .42em; color: #8A867E; margin-top: .25em; }
 .lead em { font-style: normal; color: #D9B26F; }
+.sub { grid-column: 1; margin: 14px 0 0; font-size: 21px; color: #B0ACA4; }
+.photo { grid-column: 2; grid-row: 1 / 4; position: relative; align-self: center; width: 300px; height: 300px; border-radius: 8px; overflow: hidden; box-shadow: 0 0 0 1px rgba(236,233,227,.12); }
+.photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.06); }
+.photo::after { content: ""; position: absolute; inset: 0; background: #D9B26F; mix-blend-mode: color; opacity: .22; }
+.hands { position: absolute; left: 30px; bottom: 150px; width: 760px; opacity: .22; mix-blend-mode: lighten;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent); }
 </style></head><body>
-<div><p class="tag">ML <span>/</span> model evaluation <span>/</span> open to roles</p><p class="name">Aryan Awasthi</p></div>
-<img src="../adam.jpg" alt="">
-<p class="lead"><span class="lim">lim<sub>n&nbsp;&rarr;&nbsp;&infin;</sub></span><code> effort(n) = <em>still going</em></code></p>
+<img class="hands" src="../adam.jpg" alt="">
+<p class="tag"><i></i>Open to ML and data roles</p>
+<div><p class="name">Aryan<br>Awasthi</p></div>
+<div style="grid-column:1;align-self:end"><p class="lead"><span class="lim">lim<sub>n&nbsp;&rarr;&nbsp;&infin;</sub></span><code> effort(n) = <em>still going</em></code></p>
+<p class="sub">ML and model evaluation. Thapar Institute, 2027.</p></div>
+<div class="photo"><img src="../portrait-480.jpg" alt=""></div>
 </body></html>
 """
 (ROOT / "src" / "og.html").write_text(page, encoding="utf-8")
