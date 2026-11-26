@@ -464,7 +464,7 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
                 <dt>Limit</dt><dd>Refusal accuracy is 0.87 to 0.97 against a 0.95 target. Older documents sometimes outrank current ones, so per-document authority weighting is the next measured change.</dd>
               </dl>
             </div>
-            <div class="pipe fit"><pre aria-hidden="true">question
+            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline diagram"><pre aria-hidden="true">question
    |
    +--&gt; <b>FAISS</b> (dense) ---+
    |                      +--&gt; reciprocal rank fusion
@@ -483,7 +483,7 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
                 <dt>Limit</dt><dd>Test clips run shorter than training clips, so every model had to be retrained on test-length crops to stay calibrated.</dd>
               </dl>
             </div>
-            <div class="pipe fit"><pre aria-hidden="true">audio clip
+            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline diagram"><pre aria-hidden="true">audio clip
    |
    +--&gt; <b>Whisper</b>, verbatim --&gt; DeBERTa --+
    +--&gt; <b>WavLM</b> + Whisper encoder --------+--&gt; blend
@@ -500,7 +500,7 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
                 <dt>Limit</dt><dd>Ratings are comparable within a prompt group, not across groups.</dd>
               </dl>
             </div>
-            <div class="pipe fit"><pre aria-hidden="true">prompt group --&gt; images A B C D
+            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline diagram"><pre aria-hidden="true">prompt group --&gt; images A B C D
                       |
              round-robin pairs  (A,B) (A,C) ...
                       |
@@ -519,7 +519,7 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
                 <dt>Limit</dt><dd>A full run takes about 3 to 5 hours, and the model trains on 30-second crops, so longer test clips are scored in windows.</dd>
               </dl>
             </div>
-            <div class="pipe fit"><pre aria-hidden="true">audio clip
+            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline diagram"><pre aria-hidden="true">audio clip
    |
    v
 <b>Voxtral-Mini-3B</b>      4-bit NF4, audio encoder frozen
@@ -537,7 +537,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
                 <dt>Limit</dt><dd>Only the fully connected head is gated. It holds 89% of the parameters, and the convolutional layers are left unpruned to keep features stable.</dd>
               </dl>
             </div>
-            <div class="pipe fit"><pre aria-hidden="true">effective w = w  x  sigmoid(g)      g is learned
+            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline diagram"><pre aria-hidden="true">effective w = w  x  sigmoid(g)      g is learned
                       |
    loss = cross-entropy + lambda x sum(gates)
                       |
@@ -571,7 +571,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
             <p class="dq">Dense, sparse or hybrid retrieval?<span class="src">CollegeBot</span></p>
             <figure>
               <div class="plate">
-                <div class="fit"><pre id="ret" aria-hidden="true"></pre></div>
+                <div class="fit" tabindex="0" role="img" aria-label="Chart, described in the caption below"><pre id="ret" aria-hidden="true"></pre></div>
               </div>
               <figcaption><b>Fig. 1</b>  Share of test questions whose answer fact reached the model's context, for five retrieval setups on the same corpus. The green row is the one that shipped.</figcaption>
               <div class="sr-only"><table>
@@ -587,7 +587,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
             <p class="dq">How do you keep a grammar error in the transcript?<span class="src">Spoken grammar scoring</span></p>
             <figure>
               <div class="plate">
-                <div class="fit"><pre id="wave" aria-hidden="true"></pre></div>
+                <div class="fit" tabindex="0" role="img" aria-label="Chart, described in the caption below"><pre id="wave" aria-hidden="true"></pre></div>
                 <dl class="diff">
                   <dt>said</dt><dd>he <span class="hl">don't</span> like it</dd>
                   <dt>whisper</dt><dd>he <span class="strike">doesn't</span> like it <span class="dim">  &lt;- the error is corrected away</span></dd>
