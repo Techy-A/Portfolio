@@ -12,7 +12,7 @@ the right, separated by hairlines. No cards, no boxes, no gradients.
 ## Bans
 
 1. No purple or indigo gradients, no default blue accents, no pure `#000` or `#FFF` surfaces.
-2. At most two font families: Space Grotesk and Space Mono. Never Inter.
+2. Two type families plus one mono for code: Clash Display (name, headings), Bricolage Grotesque (text), Space Mono (labels, figures, ASCII). Never Inter.
 3. No three-column icon-in-a-box feature grids, no glassmorphism panels. Hairlines and type do the work.
 4. No emoji, no em dashes, no en dashes. Every text file is plain 7-bit ASCII.
 5. No title case: sentence case for headings, buttons and labels. Uppercase only for small mono labels.
@@ -44,10 +44,11 @@ from `--ink` on a canvas, so they work on both.
 
 ## Type
 
-- Space Grotesk (variable, 300 to 700) for everything people read. Space Mono for labels, figures, ASCII.
-- h1 `clamp(52px, 10vw, 132px)`, tracking `-0.045em`; h2 `clamp(32px, 4.6vw, 56px)`, `-0.035em`; h3 24 to 36px.
+- Clash Display (self-hosted in `fonts/`, 500 and 600) for the name, headings and project titles.
+- Bricolage Grotesque (variable) for body text. Space Mono for labels, figures, the tagline and ASCII.
+- h1 `clamp(52px, 10vw, 132px)`, tracking `-0.025em`; h2 `clamp(32px, 4.6vw, 56px)`, `-0.035em`; h3 24 to 36px.
   Body 18px / 1.6, paragraphs at most 64 characters wide.
-- Dark theme uses weight 460 for display text, light uses 500, so strokes look equally thick.
+- Dark theme uses weight 500 for display text, light uses 600, so strokes look equally thick.
 - Mono labels: 11 to 12px, uppercase, `+0.08em` tracking. Figures use `tabular-nums`.
 - `text-wrap: balance` on headings, `pretty` on paragraphs.
 

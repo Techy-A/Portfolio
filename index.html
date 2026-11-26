@@ -35,7 +35,8 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/ClashDisplay-500.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230B0B0B'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='18' font-weight='700' text-anchor='middle' fill='%23D4B06E'%3EA%3C/text%3E%3C/svg%3E">
 <style>
 /* Layout: cinematic hero (the Creation of Adam hands above the name, centred), then editorial split
@@ -55,15 +56,16 @@
   --sage: #9DC4AF;        /* chosen, shipped */
   --rose: #D8A3A0;        /* tested and dropped */
   --glow: rgba(217, 178, 111, .45);
-  --sans: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans: "Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "Clash Display", "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
   --mono: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --ease: cubic-bezier(.22, 1, .36, 1);
   --gutter: 20px;
   --max: 1200px;
   color-scheme: dark;
 }
-:root { --w-display: 460; --w-head: 460; }
-:root[data-theme="light"] { --w-display: 500; --w-head: 500;
+:root { --w-display: 500; --w-head: 500; }
+:root[data-theme="light"] { --w-display: 600; --w-head: 600;
   --bg: oklch(0.982 0.004 85);       /* warm stone */
   --surface: oklch(0.955 0.006 85);
   --surface-2: oklch(0.925 0.008 85);
@@ -80,6 +82,8 @@
   color-scheme: light;
 }
 
+@font-face { font-family: "Clash Display"; src: url("fonts/ClashDisplay-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Clash Display"; src: url("fonts/ClashDisplay-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; overflow-x: clip; }
 body {
@@ -166,7 +170,7 @@ kbd { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
 .pill { display: inline-flex; align-items: center; gap: 9px; font: 12px var(--mono); color: var(--ink-2); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 13px; }
 .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); animation: live 2.4s ease-out infinite; }
 @keyframes live { 0% { box-shadow: 0 0 0 0 var(--sage); } 70%, 100% { box-shadow: 0 0 0 7px transparent; } }
-.name { font-weight: var(--w-display, 500); font-size: clamp(52px, 10vw, 132px); line-height: .92; letter-spacing: -.045em; margin: 18px 0 14px; }
+.name { font-family: var(--display); font-weight: var(--w-display, 500); font-size: clamp(52px, 10vw, 132px); line-height: .92; letter-spacing: -.025em; word-spacing: .06em; margin: 18px 0 14px; }
 .lead { font-size: clamp(18px, 2vw, 22px); line-height: 1.3; letter-spacing: -.015em; color: var(--ink-2); margin: 0 auto 14px; max-width: 30ch; text-wrap: balance; }
 .lead em { font-style: normal; color: var(--accent); }
 .tagline { margin: 4px auto 14px; font: 400 clamp(20px, 3.1vw, 38px)/1.2 var(--mono); letter-spacing: -.03em; color: var(--ink); white-space: nowrap; }
@@ -222,7 +226,7 @@ kbd { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
 @media (min-width: 960px) { .sec { grid-template-columns: 240px minmax(0, 1fr); gap: 48px; } .rail { position: sticky; top: 28px; align-self: start; } }
 .rail .k { font: 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0; }
 .rail .v { color: var(--ink-3); margin: 6px 0 0; font-size: 14px; }
-.sec h2 { font-weight: var(--w-head, 500); font-size: clamp(32px, 4.6vw, 56px); line-height: 1.02; letter-spacing: -.035em; margin: 0 0 28px; max-width: 20ch; text-wrap: balance; }
+.sec h2 { font-family: var(--display); font-weight: var(--w-head, 500); font-size: clamp(32px, 4.6vw, 56px); line-height: 1.02; letter-spacing: -.035em; margin: 0 0 28px; max-width: 20ch; text-wrap: balance; }
 .sec h3 { font-size: 24px; font-weight: 500; letter-spacing: -.02em; margin: 0; line-height: 1.25; }
 .prose { max-width: 64ch; color: var(--ink-2); }
 .prose p { margin: 0 0 16px; text-wrap: pretty; }
@@ -236,6 +240,16 @@ kbd { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
 .readout .l { font-size: 14px; color: var(--ink-3); display: block; margin-top: 10px; line-height: 1.35; }
 @media (max-width: 560px) { .readout { grid-template-columns: 1fr 1fr; } .readout div:nth-child(3) { padding-left: 0; border-left: 0; } .readout div:nth-child(n+3) { border-top: 1px solid var(--rule); } }
 
+/* about: the portrait in duotone, full colour on hover */
+.about-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; align-items: start; }
+@media (min-width: 760px) { .about-grid { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 44px; } }
+.portrait { position: relative; margin: 0; aspect-ratio: 1; max-width: 300px; overflow: hidden; border-radius: 6px; box-shadow: 0 0 0 1px var(--rule); background: var(--surface); }
+.portrait img { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.06) brightness(.96); transform: scale(1.01); transition: filter .25s var(--ease), transform .25s var(--ease); }
+.portrait::after { content: ""; position: absolute; inset: 0; background: var(--accent); mix-blend-mode: color; opacity: .22; transition: opacity .25s var(--ease); pointer-events: none; }
+@media (hover: hover) { .portrait:hover img { filter: none; transform: scale(1.03); } .portrait:hover::after { opacity: 0; } }
+.about-copy p { margin: 0 0 16px; max-width: 60ch; color: var(--ink-2); text-wrap: pretty; }
+.about-copy p:first-child { font-family: var(--display); font-weight: 500; font-size: clamp(22px, 2.6vw, 30px); line-height: 1.25; letter-spacing: -.015em; color: var(--ink); }
+.about-copy strong { color: var(--ink); font-weight: 600; }
 /* experience */
 .role-org { color: var(--ink-3); margin: 6px 0 0; }
 .ledger { list-style: none; padding: 0; margin: 8px 0 0; }
@@ -251,7 +265,7 @@ kbd { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
 @media (hover: hover) { .proj:hover { padding-left: 10px; } }
 .proj::before { content: counter(proj, decimal-leading-zero) / ""; position: absolute; left: 0; top: 36px; font: 12px var(--mono); color: var(--accent); }
 .proj > div:first-child { padding-left: 52px; }
-.proj h3 { font-size: clamp(26px, 3.2vw, 36px); letter-spacing: -.03em; }
+.proj h3 { font-family: var(--display); font-size: clamp(26px, 3.2vw, 36px); letter-spacing: -.02em; }
 .proj h3 a { color: var(--ink); text-decoration: none; }
 .proj h3 a:hover { color: var(--accent); }
 .proj h3 .ext { display: block; font: 12px var(--mono); color: var(--ink-3); letter-spacing: 0; margin-top: 6px; }
@@ -279,7 +293,7 @@ figure { margin: 22px 0; }
 @media (max-width: 520px) { .diff .dim { display: block; } }
 .decisions { list-style: none; padding: 0; margin: 28px 0 0; }
 .dec { padding: 30px 0 32px; border-top: 1px solid var(--rule); }
-.dq { font-size: 24px; font-weight: 500; letter-spacing: -.02em; line-height: 1.25; margin: 0; text-wrap: balance; }
+.dq { font-family: var(--display); font-size: 24px; font-weight: 500; letter-spacing: -.02em; line-height: 1.25; margin: 0; text-wrap: balance; }
 .dq .src { display: block; font: 12px var(--mono); color: var(--ink-3); letter-spacing: 0; margin-top: 6px; }
 .opts { list-style: none; padding: 0; margin: 16px 0 0; font-size: 16px; color: var(--ink-3); }
 .opts li { margin: 5px 0; }
@@ -345,6 +359,7 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
   <header class="bar">
     <a class="brand" href="#top">aryan.awasthi</a>
     <nav aria-label="Sections">
+      <a class="opt" href="#about">About</a>
       <a href="#experience">Experience</a>
       <a class="opt" href="#projects">Projects</a>
       <a class="opt" href="#method">Method</a>
@@ -391,6 +406,22 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
           <div><dt>Contact</dt><dd>aryanawasthi017@gmail.com</dd></div>
         </dl>
       </aside>
+    </section>
+
+    <!-- About -->
+    <section class="sec" id="about" aria-labelledby="about-h">
+      <header class="rail"><p class="k">About</p><p class="v">New Delhi, India</p></header>
+      <div>
+        <h2 id="about-h" class="sr-only">About Aryan</h2>
+        <div class="about-grid">
+          <figure class="portrait"><img src="portrait-480.jpg" srcset="portrait-480.webp 480w, portrait-960.webp 960w" sizes="(min-width: 760px) 300px, 80vw" width="480" height="480" alt="Aryan Awasthi in a navy blazer and white shirt" loading="lazy" decoding="async"></figure>
+          <div class="about-copy">
+            <p>I build the test before I trust the model.</p>
+            <p>I'm a final-year <strong>Electronics and Computer Engineering</strong> student at Thapar Institute. Most of my work sits where machine learning meets measurement: Elo and Bradley-Terry leaderboards, speaker-grouped validation, retrieval benchmarks, and the numbers that say whether a change actually helped.</p>
+            <p>I'm looking for ML, data and analytics internships and new-grad roles where being precise about results is part of the job.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Experience -->
@@ -665,7 +696,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
   <footer>
     <p class="orn" aria-hidden="true">~ * ~</p>
     <p>Aryan Awasthi, 2026</p>
-    <p>Set in Space Grotesk and Space Mono. ASCII hands after Michelangelo's fresco, found on Pinterest, original artist unknown. A plain-text summary for AI assistants is at <a href="llms.txt">llms.txt</a>.</p>
+    <p>Set in Clash Display, Bricolage Grotesque and Space Mono. ASCII hands after Michelangelo's fresco, found on Pinterest, original artist unknown. A plain-text summary for AI assistants is at <a href="llms.txt">llms.txt</a>.</p>
   </footer>
 </div>
 
@@ -897,6 +928,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
   function go(id) { return function () { var el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); }; }
   function openLink(href) { return function () { var a = document.createElement("a"); a.href = href; a.target = "_blank"; a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove(); }; }
   var ACTIONS = [
+    ["About", "section", go("about")],
     ["Experience", "section", go("experience")],
     ["Projects", "section", go("projects")],
     ["Method: six decisions and the evidence", "section", go("method")],
@@ -961,5 +993,6 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { buildWave(); buildRet(); fitAll(); });
 })();
 </script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>

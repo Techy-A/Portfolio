@@ -31,6 +31,8 @@ A single static page with no framework and no build step at runtime.
 | `src/og.py`, `src/og.html` | Source for `og.png`, the 1200 x 627 link preview. Screenshot `og.html` at that size to regenerate. |
 | `llms.txt` | Plain-text summary of the page for AI assistants. |
 | `AryanAwasthi.pdf` | Resume, linked from the page. |
+| `portrait-*.jpg/.webp` | Portrait for the About section, 480 and 960 px. |
+| `fonts/` | Clash Display (Fontshare, ITF Free Font License), self-hosted. |
 
 ## Editing
 
