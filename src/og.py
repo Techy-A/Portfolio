@@ -19,12 +19,13 @@ body { width: 1200px; height: 627px; box-sizing: border-box; padding: 40px 64px 
 .tag span { color: #D9B26F; }
 .name { margin: 6px 0 0; font-size: 84px; line-height: 1; font-weight: 500; letter-spacing: -.045em; }
 img { width: 660px; height: auto; display: block; mix-blend-mode: lighten; }
-.lead { margin: 0; font-size: 28px; letter-spacing: -.015em; color: #B0ACA4; }
+.lead { margin: 0; font: 34px "Space Mono", monospace; letter-spacing: -.03em; color: #ECE9E3; }
+.lead code { font: inherit; }
 .lead em { font-style: normal; color: #D9B26F; }
 </style></head><body>
 <div><p class="tag">ML <span>/</span> model evaluation <span>/</span> open to roles</p><p class="name">Aryan Awasthi</p></div>
 <img src="../adam.jpg" alt="">
-<p class="lead">I try every reasonable answer, then <em>prove</em> which one is better.</p>
+<p class="lead"><code>P(I stop at "good enough") = <em>0</em></code></p>
 </body></html>
 """
 (ROOT / "src" / "og.html").write_text(page, encoding="utf-8")
