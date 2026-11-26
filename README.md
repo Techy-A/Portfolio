@@ -44,13 +44,7 @@ To redo the link preview after a change, run `python src/og.py` and screenshot `
 
 ## Design notes
 
-- Matte black with a fine grain. Three muted accents carry meaning: ochre for emphasis and the spark, sage for what was chosen or shipped, rose for what was tested and dropped.
-- Set entirely in Times New Roman (Tinos as the fallback where it is not installed), with small capitals for labels and italics for asides. Courier Prime, its typewriter partner, sets the ASCII. Every heading, label and short paragraph sits on one centre axis, like a printed title page.
-- The hands are `adam.jpg`, an ASCII rendering of the hands from The Creation of Adam. A canvas turns its black into transparency, so the characters sit directly on the page's matte black and grain, and the forearms fade out at the left and right edges. Phones get a tighter crop on the two hands and the gap between them. A glowing spark sits in the gap between the fingertips.
-- On load the picture is denoised from random noise in 40 steps, like a diffusion sampler. "Sample again" reruns it. Reduced motion shows the finished image, and if the canvas is unavailable the plain image is shown.
-- Ctrl K, Cmd K or / opens a jump menu: sections, resume, copy email, GitHub, LinkedIn.
-- The first screen is a centred title page with what a recruiter scans for: name, headline, resume, email, LinkedIn and GitHub, and an at-a-glance table (role sought, latest role and dates, education, location, stack, contact).
-- House style: no em dashes, no en dashes, no emoji. Every text file is plain 7-bit ASCII.
+See `DESIGN.md` for the full spec: tokens, themes, type scale, layout, actions, motion and the anti-slop bans.
 
 ## Publishing
 
