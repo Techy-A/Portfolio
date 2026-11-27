@@ -1,10 +1,10 @@
-"""Manim scenes: Fig. 3 to Fig. 6 in the Method section and one per project card.
+"""Manim scenes: Fig. 1 and Fig. 3 to Fig. 6 in the Method section and one per project card.
 
 What: short explanatory animations, rendered once and committed as video in media/.
   FoldLeak   - random folds put a speaker's twin clip on both sides of a fold; speaker-grouped folds do not.
   GatePush   - an unimportant pruning gate under the L1 and the L2 penalty alone: L1 crosses the 0.01
                pruning threshold, L2's push fades as the gate nears zero (gradients from the project README).
-  Rrf, Arena, Listen, Lora, Prune - one idea per project card; Judge, Chain - Fig. 5 and Fig. 6.
+  Rrf, Arena, Listen, Lora, Prune - one idea per project card; Judge, Chain - Fig. 5 and Fig. 6; Retrieval - Fig. 1.
 Why: these decisions had no figure; an animation shows the mechanism, not just the verdict.
 Style: the site's palette on pure black (the page blends black away; the light theme inverts it), Space Mono text,
        no LaTeX so the render needs only Manim, Cairo, Pango and the Space Mono font.
@@ -430,4 +430,54 @@ class Chain(Scene):
         self.play(FadeIn(answer1), FadeIn(done), run_time=.5)
         note = label("Groq free tier: 6,000 tokens per minute, shared by every visitor", 16, INK3).move_to([-6.8, -3.05, 0], aligned_edge=LEFT)
         self.play(FadeIn(note), run_time=.5)
+        self.wait(3)
+
+
+class Retrieval(Scene):
+    """CollegeBot Fig. 1: share of test questions whose answer fact reaches the context, and the latency each setup
+    adds. Every number is from the README's retrieval table."""
+
+    def construct(self):
+        from manim import Rectangle
+        rows = [("Dense MMR, k = 6", 77.1, 0, "none"), ("BM25 only, top 8", 80.0, 0, "none"),
+                ("Dense + reranker, top 8", 88.6, 2.0, "+2.0 s"), ("Hybrid dense + BM25, top 8", 88.6, 0, "none"),
+                ("Hybrid + reranker, top 8", 85.7, 1.4, "+1.4 s"), ("Hybrid, top 16", 91.4, 0, "none")]
+        bx, span, lx = -2.55, 5.0, 4.35                    # bar start, width of 100%, latency column
+        y = lambda i: 1.9 - i * .8
+        h1 = label("fact reaches the context", 18, INK3).move_to([bx, 2.85, 0], aligned_edge=LEFT)
+        h2 = label("added latency", 18, INK3).move_to([lx, 2.85, 0], aligned_edge=LEFT)
+        names = VGroup(*[label(r[0], 18, INK).move_to([-6.8, y(i), 0], aligned_edge=LEFT) for i, r in enumerate(rows)])
+        base = Line([bx, 2.4, 0], [bx, y(5) - .4, 0], color=INK3, stroke_width=2)
+        self.play(FadeIn(h1), FadeIn(h2), FadeIn(names, lag_ratio=.1), Create(base), run_time=1.2)
+
+        bars, vals = VGroup(), VGroup()
+        for i, (name, v, lat, ltxt) in enumerate(rows):
+            b = Rectangle(width=span * v / 100, height=.42, stroke_width=0, fill_color=INK, fill_opacity=.85)
+            b.move_to([bx, y(i), 0], aligned_edge=LEFT)
+            bars.add(b)
+            vals.add(label(f"{v:.1f}%", 18, INK).next_to(b, RIGHT, buff=.15))
+        from manim import GrowFromEdge
+        self.play(*[GrowFromEdge(b, LEFT) for b in bars], *[FadeIn(v) for v in vals], lag_ratio=.15, run_time=2.2)
+        lats = VGroup()
+        for i, (name, v, lat, ltxt) in enumerate(rows):
+            if lat:
+                r = Rectangle(width=lat * .75, height=.42, stroke_width=0, fill_color=ROSE, fill_opacity=.85)
+                r.move_to([lx, y(i), 0], aligned_edge=LEFT)
+                lats.add(VGroup(r, label(ltxt, 18, ROSE).next_to(r, RIGHT, buff=.12)))
+            else:
+                lats.add(label(ltxt, 18, INK3).move_to([lx, y(i), 0], aligned_edge=LEFT))
+        self.play(*[FadeIn(l, shift=RIGHT * .2) for l in lats], run_time=1.0)
+        self.wait(.6)
+
+        tie = VGroup(Line(bars[2].get_right() + RIGHT * .95, bars[3].get_right() + RIGHT * .95, color=GOLD, stroke_width=4))
+        tl = label("same 88.6%", 18, GOLD, "BOLD").next_to(tie, RIGHT, buff=.15)
+        self.play(Create(tie), FadeIn(tl), *[b.animate.set_fill(GOLD) for b in bars[2:4]], run_time=.9)
+        self.wait(.8)
+        worse = label("reranker on top made it worse", 17, ROSE).move_to([-6.8, -2.95, 0], aligned_edge=LEFT)
+        self.play(bars[4].animate.set_fill(ROSE, opacity=.7), FadeIn(worse), run_time=.8)
+        tokens = label("top 16: +2.8 points for twice the context tokens", 17, INK3).next_to(worse, DOWN, buff=.1).align_to(worse, LEFT)
+        self.play(bars[5].animate.set_fill(INK3, opacity=.6), FadeIn(tokens), run_time=.8)
+        ship = label("shipped", 18, SAGE, "BOLD").next_to(lats[3], RIGHT, buff=.3)
+        self.play(bars[3].animate.set_fill(SAGE), names[3].animate.set_color(SAGE), vals[3].animate.set_color(SAGE),
+                  FadeIn(ship), FadeOut(tie), FadeOut(tl), bars[2].animate.set_fill(INK), run_time=1.0)
         self.wait(3)

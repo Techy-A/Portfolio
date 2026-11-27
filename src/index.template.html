@@ -116,7 +116,6 @@ pre { margin: 0; font-size: 13px; line-height: 1.4; white-space: pre; text-align
 .fit pre { display: inline-block; }
 .plate .fit, .pipe.fit { overflow-x: auto; }
 .hl { color: var(--accent); }
-.ok { color: var(--sage); }
 .dim { color: var(--ink-3); }
 .strike { text-decoration: line-through; text-decoration-color: var(--rose); color: var(--ink-3); }
 .label { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
@@ -643,13 +642,15 @@ middle layer: mean of audio tokens + last position
             <p class="dq">Dense, sparse or hybrid retrieval?<span class="src">CollegeBot</span></p>
             <figure>
               <div class="plate">
-                <div class="fit" tabindex="0" role="img" aria-label="Chart, described in the caption below"><pre id="ret" aria-hidden="true"></pre></div>
+                <video class="anim" width="1280" height="640" muted loop playsinline preload="none" poster="media/retrieval.webp" aria-hidden="true">
+                  <source src="media/retrieval.mp4" type="video/mp4">
+                </video>
               </div>
-              <figcaption><b>Fig. 1</b>  Share of test questions whose answer fact reached the model's context, for five retrieval setups on the same corpus. The green row is the one that shipped.</figcaption>
+              <figcaption><b>Fig. 1</b>  Share of test questions whose answer fact reached the model's context, and the latency each retrieval setup adds, from the CollegeBot README. The green row is the one that shipped. Animated with Manim.</figcaption>
               <div class="sr-only"><table>
                 <caption>Retrieval setups compared</caption>
                 <thead><tr><th>Setup</th><th>Fact reaches context</th><th>Added latency</th></tr></thead>
-                <tbody id="ret-table"></tbody>
+                <tbody><tr><td>Dense MMR, k = 6</td><td>77.1%</td><td>none</td></tr><tr><td>BM25 only, top 8</td><td>80.0%</td><td>none</td></tr><tr><td>Dense + cross-encoder reranker, top 8</td><td>88.6%</td><td>about 2.0 s per query</td></tr><tr><td>Hybrid dense + BM25 (RRF), top 8, shipped</td><td>88.6%</td><td>none</td></tr><tr><td>Hybrid + cross-encoder reranker, top 8</td><td>85.7%</td><td>about 1.4 s per query</td></tr><tr><td>Hybrid, top 16</td><td>91.4%</td><td>none, but twice the context tokens</td></tr></tbody>
               </table></div>
             </figure>
             <p class="why"><b>Chose hybrid with reciprocal rank fusion.</b> It ties the best reranker at 88.6% with no added latency, and stacking a reranker on top made it worse. The corpus is full of proper nouns and exact amounts, where lexical matching beats a 384-dimension dense embedding.</p>
@@ -869,41 +870,6 @@ middle layer: mean of audio tokens + last position
     var lab = labels.join("").replace("don't", '<span class="hl">don\'t</span>');
     lines.push(""); lines.push(lab);
     el.innerHTML = lines.join("\n");
-  }
-
-  /* ---------- Fig. 1: retrieval setups, ASCII bar chart ---------- */
-  var RET = [
-    ["Dense MMR, k = 6", 77.1, "none"],
-    ["BM25 only", 80.0, "none"],
-    ["Dense + cross-encoder", 88.6, "~2 s/query"],
-    ["Hybrid dense + BM25 (RRF)", 88.6, "none"],
-    ["Hybrid + cross-encoder", 85.7, "~1.4 s/query"]
-  ];
-  var PICK = 3;
-  function pad(s, n) { s = String(s); while (s.length < n) s += " "; return s; }
-  function buildRet() {
-    var el = document.getElementById("ret");
-    var w = el.parentNode.clientWidth;
-    var wide = w >= 600;
-    var barW = wide ? 40 : 20, nameW = wide ? 28 : 27;
-    var out = [];
-    out.push('<span class="dim">' + pad("setup", nameW) + (wide ? pad("fact reaches context, 0 to 100%", barW + 9) + "added latency" : "") + "</span>");
-    out.push("");
-    RET.forEach(function (r, i) {
-      var n = Math.round(r[1] / 100 * barW);
-      var bar = Array(n + 1).join("#") + Array(barW - n + 1).join(".");
-      var line = wide
-        ? pad(r[0], nameW) + bar + "  " + r[1].toFixed(1) + "%  " + r[2]
-        : pad(r[0], nameW) + "\n" + bar + " " + r[1].toFixed(1) + "% " + r[2];
-      if (i === PICK) line = '<span class="ok">' + line + "  &lt;- shipped</span>";
-      out.push(line);
-      if (!wide && i < RET.length - 1) out.push("");
-    });
-    el.innerHTML = out.join("\n");
-    var tb = document.getElementById("ret-table");
-    if (!tb.children.length) {
-      tb.innerHTML = RET.map(function (r) { return "<tr><td>" + r[0] + "</td><td>" + r[1].toFixed(1) + "%</td><td>" + r[2] + "</td></tr>"; }).join("");
-    }
   }
 
   /* ---------- scale ASCII blocks to their container ---------- */
@@ -1142,7 +1108,7 @@ middle layer: mean of audio tokens + last position
     });
   }, 200);
 
-  /* ---------- Manim clips (projects, Fig. 3 to 6): play at 1.2x only while on screen; reduced motion keeps the final frame ---------- */
+  /* ---------- Manim clips (projects and Method figures): play at 1.2x only while on screen; reduced motion keeps the final frame ---------- */
   if (!reduce && "IntersectionObserver" in window) {
     var vio = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
@@ -1241,11 +1207,10 @@ middle layer: mean of audio tokens + last position
   }
 
   buildWave();
-  buildRet();
   fitAll();
   var t;
-  window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(function () { buildWave(); buildRet(); fitAll(); }, 80); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { buildWave(); buildRet(); fitAll(); });
+  window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(function () { buildWave(); fitAll(); }, 80); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { buildWave(); fitAll(); });
 })();
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
