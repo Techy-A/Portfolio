@@ -1,10 +1,10 @@
-"""Manim scenes: Fig. 1 and Fig. 3 to Fig. 6 in the Method section and one per project card.
+"""Manim scenes: Fig. 1 to Fig. 6 in the Method section and one per project card.
 
 What: short explanatory animations, rendered once and committed as video in media/.
   FoldLeak   - random folds put a speaker's twin clip on both sides of a fold; speaker-grouped folds do not.
   GatePush   - an unimportant pruning gate under the L1 and the L2 penalty alone: L1 crosses the 0.01
                pruning threshold, L2's push fades as the gate nears zero (gradients from the project README).
-  Rrf, Arena, Listen, Lora, Prune - one idea per project card; Judge, Chain - Fig. 5 and Fig. 6; Retrieval - Fig. 1.
+  Rrf, Arena, Listen, Lora, Prune - one idea per project card; Judge, Chain - Fig. 5 and Fig. 6; Retrieval, Verbatim - Fig. 1 and Fig. 2.
 Why: these decisions had no figure; an animation shows the mechanism, not just the verdict.
 Style: the site's palette on pure black (the page blends black away; the light theme inverts it), Space Mono text,
        no LaTeX so the render needs only Manim, Cairo, Pango and the Space Mono font.
@@ -480,4 +480,62 @@ class Retrieval(Scene):
         ship = label("shipped", 18, SAGE, "BOLD").next_to(lats[3], RIGHT, buff=.3)
         self.play(bars[3].animate.set_fill(SAGE), names[3].animate.set_color(SAGE), vals[3].animate.set_color(SAGE),
                   FadeIn(ship), FadeOut(tie), FadeOut(tl), bars[2].animate.set_fill(INK), run_time=1.0)
+        self.wait(3)
+
+
+class Verbatim(Scene):
+    """Grammar scoring Fig. 2: the speaker says "he don't like it"; default Whisper writes "doesn't", a verbatim
+    prompt keeps "don't", and the audio models score the sound with no transcript. The waveform is illustrative."""
+
+    def construct(self):
+        rng = np.random.default_rng(7)
+        n, x0, x1, mid = 120, -6.0, 6.0, 1.75
+        words = [("he", .04, .12, .7), ("don't", .19, .40, 1.0), ("like", .47, .66, .8), ("it", .73, .82, .65)]
+        xs = np.linspace(x0, x1, n)
+        amp = .05 + .07 * rng.random(n)
+        for _, a, b, peak in words:
+            for i in range(n):
+                f = i / (n - 1)
+                if a <= f <= b:
+                    amp[i] = max(amp[i], peak * np.sin(np.pi * (f - a) / (b - a)) * (.55 + .45 * rng.random()))
+        err = lambda i: words[1][1] <= i / (n - 1) <= words[1][2]
+        bars = VGroup(*[Line([xs[i], mid - amp[i] * .95, 0], [xs[i], mid + amp[i] * .95, 0], color=GOLD if err(i) else INK,
+                             stroke_width=4) for i in range(n)])
+        names = VGroup(*[label(w, 20, GOLD if w == "don't" else INK, "BOLD" if w == "don't" else "NORMAL")
+                         .move_to([x0 + (a + b) / 2 * (x1 - x0), mid - 1.25, 0]) for w, a, b, _ in words])
+        said = label("what the speaker said", 18, INK3).move_to([-6.8, 3.15, 0], aligned_edge=LEFT)
+        self.play(FadeIn(said), Create(bars, lag_ratio=.01), run_time=1.6)
+        self.play(FadeIn(names, lag_ratio=.25), run_time=1.0)
+        self.wait(.4)
+
+        ys, tx = (-.55, -1.55, -2.55), -1.3
+        rows = VGroup(label("default Whisper", 18, INK3), label("Whisper, verbatim prompt", 18, INK3),
+                      label("audio models, no transcript", 18, INK3))
+        for r, y in zip(rows, ys):
+            r.move_to([-6.8, y, 0], aligned_edge=LEFT)
+        sx = ValueTracker(x0 - .2)
+        scan = always_redraw(lambda: Line([sx.get_value(), mid + 1.05, 0], [sx.get_value(), ys[2] - .3, 0],
+                                          color=GOLD, stroke_width=2, stroke_opacity=.55))
+        self.play(FadeIn(rows, lag_ratio=.2), run_time=.8)
+        self.add(scan)
+
+        default = ["he", "doesn't", "like", "it"]
+        verbatim = ["he", "don't", "like", "it"]
+        def line(ws, y, hi, colour):
+            out = VGroup(*[label(w, 20, colour if i == 1 else INK, "BOLD" if i == 1 else "NORMAL") for i, w in enumerate(ws)])
+            out.arrange(RIGHT, buff=.22).move_to([tx, y, 0], aligned_edge=LEFT)
+            return out
+        d_line, v_line = line(default, ys[0], 1, ROSE), line(verbatim, ys[1], 1, GOLD)
+        for k, (_, a, b, _) in enumerate(words):
+            self.play(sx.animate.set_value(x0 + b * (x1 - x0) + .1), FadeIn(d_line[k]), FadeIn(v_line[k]),
+                      run_time=.7, rate_func=linear)
+        self.play(sx.animate.set_value(x1 + .2), run_time=.5, rate_func=linear)
+        self.remove(scan)
+        strike = Line(d_line[1].get_left(), d_line[1].get_right(), color=ROSE, stroke_width=3)
+        lost = label("the error is corrected away", 18, ROSE).next_to(d_line, RIGHT, buff=.5)
+        kept = label("the error is kept", 18, SAGE, "BOLD").next_to(v_line, RIGHT, buff=.5).align_to(lost, LEFT)
+        hears = label("hears how it was said: WavLM, Voxtral", 18, SAGE, "BOLD").move_to([tx, ys[2], 0], aligned_edge=LEFT)
+        self.play(Create(strike), FadeIn(lost), run_time=.8)
+        self.play(FadeIn(kept), run_time=.6)
+        self.play(FadeIn(hears), run_time=.6)
         self.wait(3)

@@ -114,10 +114,7 @@ pre, .mono { font-family: var(--mono); }
 pre { margin: 0; font-size: 13px; line-height: 1.4; white-space: pre; text-align: left; }
 .fit { overflow: hidden; }
 .fit pre { display: inline-block; }
-.plate .fit, .pipe.fit { overflow-x: auto; }
-.hl { color: var(--accent); }
-.dim { color: var(--ink-3); }
-.strike { text-decoration: line-through; text-decoration-color: var(--rose); color: var(--ink-3); }
+.pipe.fit { overflow-x: auto; }
 .label { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
 
 /* nav */
@@ -307,10 +304,6 @@ figure { margin: 22px 0; }
 @media (max-width: 560px) { .motion { margin-left: 0; } }
 .sec figcaption { font: 12px/1.6 var(--mono); color: var(--ink-3); margin: 12px 0 0; max-width: 70ch; }
 .sec figcaption b { color: var(--accent); font-weight: 400; }
-.diff { display: grid; grid-template-columns: max-content minmax(0, max-content); gap: 6px 18px; font-family: var(--mono); font-size: 14px; margin: 18px 0 0; }
-.diff dt { color: var(--ink-3); }
-.diff dd { margin: 0; color: var(--ink); min-width: 0; }
-@media (max-width: 520px) { .diff .dim { display: block; } }
 .decisions { list-style: none; padding: 0; margin: 28px 0 0; }
 .dec { padding: 30px 0 32px; border-top: 1px solid var(--rule); }
 .dq { font-family: var(--display); font-size: 24px; font-weight: 500; letter-spacing: -.02em; line-height: 1.25; margin: 0; text-wrap: balance; }
@@ -660,13 +653,11 @@ middle layer: mean of audio tokens + last position
             <p class="dq">How do you keep a grammar error in the transcript?<span class="src">Spoken grammar scoring</span></p>
             <figure>
               <div class="plate">
-                <div class="fit" tabindex="0" role="img" aria-label="Chart, described in the caption below"><pre id="wave" aria-hidden="true"></pre></div>
-                <dl class="diff">
-                  <dt>said</dt><dd>he <span class="hl">don't</span> like it</dd>
-                  <dt>whisper</dt><dd>he <span class="strike">doesn't</span> like it <span class="dim">  &lt;- the error is corrected away</span></dd>
-                </dl>
+                <video class="anim" width="1280" height="640" muted loop playsinline preload="none" poster="media/verbatim.webp" aria-hidden="true">
+                  <source src="media/verbatim.mp4" type="video/mp4">
+                </video>
               </div>
-              <figcaption><b>Fig. 2</b>  Illustrative waveform. A default speech recogniser repairs the very errors the model has to score.</figcaption>
+              <figcaption><b>Fig. 2</b>  Illustrative waveform. The speaker says "he don't like it"; a default speech recogniser writes "he doesn't like it", repairing the very error the model has to score. A verbatim prompt keeps the error, and the audio models judge the sound itself. Animated with Manim.</figcaption>
             </figure>
             <ul class="opts" aria-label="Options compared">
               <li>Default Whisper transcripts</li>
@@ -826,51 +817,8 @@ middle layer: mean of audio tokens + last position
     return r;
   }
 
-  /* ---------- Fig. 1: waveform of "he don't like it" ---------- */
+  /* ---------- seeded random numbers, used by the hands' noise ---------- */
   function rng(seed) { return function () { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }; }
-  function buildWave() {
-    var el = document.getElementById("wave");
-    var box = el.parentNode;
-    var cols = Math.max(40, Math.min(96, Math.floor(box.clientWidth / (11 * charRatio()))));
-    var r = rng(7), rows = 3, s = cols / 68;
-    // word spans on a 68-column grid: [start, end, peak]; "don't" is the error
-    var words = [[3, 9, 0.75], [14, 27, 1.0], [32, 44, 0.8], [50, 56, 0.65]].map(function (w) {
-      return [Math.round(w[0] * s), Math.round(w[1] * s), w[2]];
-    });
-    var hiStart = words[1][0], hiEnd = words[1][1];
-    var amp = [];
-    for (var c = 0; c < cols; c++) {
-      var a = 0.04 + r() * 0.06;
-      words.forEach(function (w) {
-        if (c >= w[0] && c <= w[1]) {
-          var t = (c - w[0]) / (w[1] - w[0]);
-          a = Math.max(a, w[2] * Math.sin(Math.PI * t) * (0.55 + r() * 0.45));
-        }
-      });
-      amp.push(a);
-    }
-    var lines = [];
-    for (var k = rows; k >= -rows; k--) {
-      var line = "";
-      for (var c2 = 0; c2 < cols; c2++) {
-        var lvl = amp[c2] * (rows + 0.6), d = Math.abs(k), ch;
-        if (k === 0) ch = lvl > 0.5 ? "|" : "-";
-        else if (lvl > d + 0.5) ch = "|";
-        else if (lvl > d) ch = ":";
-        else if (lvl > d - 0.25) ch = ".";
-        else ch = " ";
-        if (c2 >= hiStart && c2 <= hiEnd && ch !== " " && ch !== "-") ch = '<span class="hl">' + ch + "</span>";
-        line += ch;
-      }
-      lines.push(line);
-    }
-    var labels = Array(cols + 1).join(" ").split("");
-    function put(str, w) { var at = Math.round((w[0] + w[1]) / 2 - str.length / 2); for (var i = 0; i < str.length; i++) labels[at + i] = str[i]; }
-    put("he", words[0]); put("don't", words[1]); put("like", words[2]); put("it", words[3]);
-    var lab = labels.join("").replace("don't", '<span class="hl">don\'t</span>');
-    lines.push(""); lines.push(lab);
-    el.innerHTML = lines.join("\n");
-  }
 
   /* ---------- scale ASCII blocks to their container ---------- */
   function longest(pre) { return pre.textContent.split("\n").reduce(function (m, l) { return Math.max(m, l.length); }, 0); }
@@ -1206,11 +1154,10 @@ middle layer: mean of audio tokens + last position
     } catch (err) { fallback(); }
   }
 
-  buildWave();
   fitAll();
   var t;
-  window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(function () { buildWave(); fitAll(); }, 80); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { buildWave(); fitAll(); });
+  window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(fitAll, 80); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
 })();
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
