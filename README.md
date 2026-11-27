@@ -33,7 +33,7 @@ A single static page with no framework and no build step at runtime.
 | `AryanAwasthi.pdf` | Resume, linked from the page. |
 | `portrait-*.jpg/.webp` | Portrait for the About section, 480 and 960 px. |
 | `fonts/` | Clash Display (Fontshare, ITF Free Font License), self-hosted. |
-| `src/manim/` | [Manim](https://www.manim.community/) scenes (MIT) for Fig. 3 and Fig. 4 in the Method section, and the script that renders them. |
+| `src/manim/` | [Manim](https://www.manim.community/) scenes (MIT): one per project card and Fig. 3 and Fig. 4 in the Method section, plus the script that renders them. |
 | `media/` | The rendered clips (`.mp4`) and their last frames (`.webp`, the poster and the reduced-motion still). |
 
 ## Editing

@@ -304,6 +304,8 @@ figure { margin: 22px 0; }
 .plate:has(> .anim) { background: var(--bg); }     /* the backdrop the blend works against */
 .anim { display: block; width: 100%; height: auto; mix-blend-mode: lighten; }
 :root[data-theme="light"] .anim { filter: invert(1) hue-rotate(180deg); mix-blend-mode: darken; }
+.motion { margin: 18px 0 0 52px; }
+@media (max-width: 560px) { .motion { margin-left: 0; } }
 .sec figcaption { font: 12px/1.6 var(--mono); color: var(--ink-3); margin: 12px 0 0; max-width: 70ch; }
 .sec figcaption b { color: var(--accent); font-weight: 400; }
 .diff { display: grid; grid-template-columns: max-content minmax(0, max-content); gap: 6px 18px; font-family: var(--mono); font-size: 14px; margin: 18px 0 0; }
@@ -494,6 +496,14 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
                                              |
                                              v
                                  cited answer  or  refusal</pre></div>
+            <figure class="motion">
+              <div class="plate">
+                <video class="anim" width="1280" height="640" muted loop playsinline preload="none" poster="media/rrf.webp" aria-hidden="true">
+                  <source src="media/rrf.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption><b>In motion</b>  Reciprocal rank fusion as written in rag.py, k = 60. A passage both retrievers find outranks one that only either finds. Passage names are illustrative.</figcaption>
+            </figure>
           </li>
           <li class="proj">
             <div>
@@ -517,6 +527,14 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
                                                         |
                                                         v
                                                    0 to 5</pre></div>
+            <figure class="motion">
+              <div class="plate">
+                <video class="anim" width="1280" height="640" muted loop playsinline preload="none" poster="media/listen.webp" aria-hidden="true">
+                  <source src="media/listen.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption><b>In motion</b>  The attention-pooling head in the main model. Every epoch it sees a fresh test-length prefix of each clip and learns which frames carry the grammar evidence. Frames and weights are illustrative.</figcaption>
+            </figure>
           </li>
           <li class="proj">
             <div>
@@ -536,6 +554,14 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
    +------------------+-------------------+
                       |
            <b>Elo</b> + <b>Bradley-Terry MLE</b> --&gt; ranking</pre></div>
+            <figure class="motion">
+              <div class="plate">
+                <video class="anim" width="1280" height="640" muted loop playsinline preload="none" poster="media/arena.webp" aria-hidden="true">
+                  <source src="media/arena.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption><b>In motion</b>  Round-robin inside prompt groups cuts 1,225 matches to 225. Inside a group, Elo with K = 32 from 1500 updates after every match; the outcomes shown are illustrative.</figcaption>
+            </figure>
           </li>
           <li class="proj">
             <div>
@@ -557,6 +583,14 @@ middle layer: mean of audio tokens + last position
    |
    v
 <b>linear head</b> --&gt; grammar score 0 to 5</pre></div>
+            <figure class="motion">
+              <div class="plate">
+                <video class="anim" width="1280" height="640" muted loop playsinline preload="none" poster="media/lora.webp" aria-hidden="true">
+                  <source src="media/lora.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption><b>In motion</b>  LoRA adds a trainable rank-16 product B A to a frozen 4-bit weight matrix. For an example 3,072 x 3,072 projection that trains 1.04% of the weights.</figcaption>
+            </figure>
           </li>
           <li class="proj">
             <div>
@@ -574,6 +608,14 @@ middle layer: mean of audio tokens + last position
    [##.#..#.##...#.#..##.#...#..]  surviving weights
                       |
            sparse classifier head</pre></div>
+            <figure class="motion">
+              <div class="plate">
+                <video class="anim" width="1280" height="640" muted loop playsinline preload="none" poster="media/prune.webp" aria-hidden="true">
+                  <source src="media/prune.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption><b>In motion</b>  The three lambda runs from the report. Each prunes the classifier head fully; a stronger penalty prunes sooner and costs accuracy. Per-gate timing is illustrative.</figcaption>
+            </figure>
           </li>
         </ol>
         <div class="more">
@@ -1084,11 +1126,12 @@ middle layer: mean of audio tokens + last position
     });
   }, 200);
 
-  /* ---------- Fig. 3 and 4: the Manim clips play only while on screen; reduced motion keeps the final frame ---------- */
+  /* ---------- Manim clips (projects, Fig. 3 and 4): play at 1.2x only while on screen; reduced motion keeps the final frame ---------- */
   if (!reduce && "IntersectionObserver" in window) {
     var vio = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
         if (!e.isIntersecting) { e.target.pause(); return; }
+        e.target.playbackRate = 1.2;
         var pr = e.target.play();
         if (pr && pr.catch) pr.catch(function () {});     // autoplay refused: the poster still tells the story
       });
