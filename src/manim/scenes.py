@@ -9,18 +9,29 @@ Why: these decisions had no figure; an animation shows the mechanism, not just t
 Style: the site's palette on pure black (the page blends black away; the light theme inverts it), Space Mono text,
        no LaTeX so the render needs only Manim, Cairo, Pango and the Space Mono font.
 
+Phone: with PHONE=1 in the environment every scene renders a portrait 720 x 1080 layout instead (panels stacked,
+       text the same size relative to the frame width), so labels stay readable in a phone's narrow column.
+
 Usage (from the repo root, Manim Community 0.19+ and Space Mono installed):
-  python src/manim/render.py [name ...]   # renders the scenes (all by default), then encodes media/*.mp4 and *.webp posters
+  python src/manim/render.py [name ...]   # renders the scenes (all by default), both layouts, then encodes media/
 """
+import os
+
 import numpy as np
 from manim import (Axes, Circle, Create, DashedLine, Dot, FadeIn, FadeOut, Line, Scene, Text, ValueTracker,
-                   VGroup, always_redraw, config, linear, LEFT, RIGHT, UP, DOWN, UL, UR, DL)
+                   VGroup, always_redraw, config, linear, LEFT, RIGHT, UP, DOWN, UL, UR, DL, ORIGIN)
 
 INK, INK3, GOLD, SAGE, ROSE = "#ECE9E3", "#8E8A82", "#D9B26F", "#9DC4AF", "#D8A3A0"
 FONT = "Space Mono"
 config.background_color = "#000000"
-config.pixel_width, config.pixel_height = 1280, 640
-config.frame_width, config.frame_height = 14.2, 7.1
+PHONE = os.environ.get("PHONE") == "1"
+if PHONE:                                   # x from -3.7 to 3.7, y from -5.55 to 5.55
+    config.pixel_width, config.pixel_height = 720, 1080
+    config.frame_width, config.frame_height = 7.4, 11.1
+else:                                       # x from -7.1 to 7.1, y from -3.55 to 3.55
+    config.pixel_width, config.pixel_height = 1280, 640
+    config.frame_width, config.frame_height = 14.2, 7.1
+L = -3.45 if PHONE else -6.8                # left text margin
 
 
 def label(text, size=22, color=INK3, weight="NORMAL"):
@@ -34,6 +45,8 @@ class FoldLeak(Scene):
         rng = np.random.default_rng(3)
         centres = [np.array([x, y, 0]) for x, y in
                    [(-4.6, 1.3), (-2.4, -1.1), (-0.6, 1.6), (1.2, -0.9), (3.1, 1.2), (4.9, -1.2), (-4.0, -1.6), (2.4, 2.4)]]
+        if PHONE:
+            centres = [c * np.array([.45, 1.4, 0]) + np.array([0, -.3, 0]) for c in centres]
         clips, owner = [], []
         for s, c in enumerate(centres):
             a = rng.uniform(0, np.pi)                    # a speaker's two clips sit close, never on top of each other
@@ -46,6 +59,8 @@ class FoldLeak(Scene):
                      VGroup(Circle(radius=.11, color=GOLD, fill_color=GOLD, fill_opacity=1),
                             label("validation", 20)).arrange(RIGHT, buff=.15)).arrange(RIGHT, buff=.45)
         key.to_corner(UR, buff=.4)
+        if PHONE:
+            key.next_to(title, DOWN, buff=.3).align_to(title, LEFT)
         self.play(FadeIn(title), FadeIn(key), *[Create(d) for d in dots], run_time=1.6)
         self.wait(.4)
 
@@ -57,7 +72,8 @@ class FoldLeak(Scene):
             leaks = [i for i in val if any(owner[j] == owner[i] and j not in val for j in range(len(clips)))]
             lines = VGroup(*[Line(clips[i], clips[j], color=GOLD, stroke_width=5)
                              for i in leaks for j in range(len(clips)) if owner[j] == owner[i] and j != i])
-            count = label(f"{len(leaks)} of {len(val)} validation clips share a voice with training", 20, colour)
+            count = label(f"{len(leaks)} of {len(val)} validation clips" + ("\n" if PHONE else " ") + "share a voice with training",
+                          20, colour)
             VGroup(head, count).arrange(DOWN, aligned_edge=LEFT, buff=.12).to_corner(DL, buff=.4)
             return head, moves, lines, count
 
@@ -88,14 +104,15 @@ class GatePush(Scene):
                 g = sig(s); out.append(g); s -= lr * push(g)
             paths[name] = np.array(out)
 
-        ax = Axes(x_range=[0, T, 250], y_range=[0, 3, 1], x_length=10.6, y_length=4.6, tips=False,
-                  axis_config={"color": INK3, "stroke_width": 2, "include_ticks": True}).shift(DOWN * .25 + RIGHT * .55)
+        ax = Axes(x_range=[0, T, 250], y_range=[0, 3, 1], x_length=5.5 if PHONE else 10.6, y_length=6.0 if PHONE else 4.6,
+                  tips=False, axis_config={"color": INK3, "stroke_width": 2, "include_ticks": True})
+        ax.shift(DOWN * .7 + RIGHT * .2 if PHONE else DOWN * .25 + RIGHT * .55)
         ticks = VGroup(*[label(t, 20).next_to(ax.c2p(0, y), LEFT, buff=.2) for t, y in
                          (("1", 3), ("0.1", 2), ("0.01", 1), ("0.001", 0))])
         ylab = label("gate value (log)", 20).next_to(ax, UP, buff=.2).align_to(ax, LEFT).shift(LEFT * .9)
         xlab = label("training steps, penalty only", 20).next_to(ax, DOWN, buff=.25).align_to(ax, RIGHT)
         thr = DashedLine(ax.c2p(0, 1), ax.c2p(T, 1), color=INK3, stroke_width=2, dash_length=.12)
-        thr_lab = label("pruning threshold 0.01", 20).next_to(ax.c2p(0, 1), DOWN, buff=.15).align_to(ax.c2p(25, 0), LEFT)
+        thr_lab = label("threshold 0.01" if PHONE else "pruning threshold 0.01", 20).next_to(ax.c2p(0, 1), DOWN, buff=.15).align_to(ax.c2p(25, 0), LEFT)
         self.play(Create(ax), FadeIn(ticks), FadeIn(ylab), FadeIn(xlab), run_time=1.2)
         self.play(Create(thr), FadeIn(thr_lab), run_time=.7)
 
@@ -109,11 +126,13 @@ class GatePush(Scene):
             heads.add(always_redraw(lambda k=k: Dot(ax.c2p(t.get_value(), f[k](t.get_value())), radius=.09, color=colour[k])))
             tags.add(always_redraw(lambda k=k: label(k, 24, colour[k], "BOLD").next_to(
                 ax.c2p(t.get_value(), f[k](t.get_value())), UR, buff=.08)))
-        readout = always_redraw(lambda: label(
-            "push on gate score   L1 g(1-g) = %.4f   L2 2g^2(1-g) = %.4f" % (
-                paths["L1"][int(t.get_value())] * (1 - paths["L1"][int(t.get_value())]),
-                2 * paths["L2"][int(t.get_value())] ** 2 * (1 - paths["L2"][int(t.get_value())])), 20, INK)
-            .to_edge(UP, buff=.3).align_to(ax, RIGHT))
+        sep = "\n" if PHONE else "   "
+        def readout_text():
+            g1, g2 = paths["L1"][int(t.get_value())], paths["L2"][int(t.get_value())]
+            m = label(("push on gate score" + sep + "L1 g(1-g) = %.4f" + sep + "L2 2g^2(1-g) = %.4f") % (
+                g1 * (1 - g1), 2 * g2 ** 2 * (1 - g2)), 20, INK)
+            return m.move_to([L, 4.6, 0], aligned_edge=LEFT) if PHONE else m.to_edge(UP, buff=.3).align_to(ax, RIGHT)
+        readout = always_redraw(readout_text)
         self.add(curves, heads, tags, readout)
         cross = int(np.argmax(paths["L1"] < .01))
         self.play(t.animate.set_value(cross), run_time=5.5, rate_func=linear)
@@ -121,7 +140,7 @@ class GatePush(Scene):
         pruned = label("L1: pruned", 22, SAGE, "BOLD").next_to(ring, DOWN, buff=.15)
         self.play(Create(ring), FadeIn(pruned), run_time=.6)
         self.play(t.animate.set_value(T), run_time=3.5, rate_func=linear)
-        end = label("L2: g = %.3f, still above the threshold" % paths["L2"][T], 22, ROSE, "BOLD")
+        end = label(("L2: g = %.3f" + ("\n" if PHONE else ", ") + "still above the threshold") % paths["L2"][T], 22, ROSE, "BOLD")
         end.align_to(ax.c2p(T, 0), RIGHT).set_y(ax.c2p(0, 2.4)[1])
         self.play(FadeIn(end), run_time=.6)
         self.wait(3)
@@ -137,13 +156,14 @@ class Rrf(Scene):
         K, KEEP = 60, 8
         dense = ["fees p.3", "hostel p.7", "admissions p.2", "placements p.12", "fees p.4", "scholarship p.5"]
         sparse = ["admissions p.2", "refunds p.9", "fees p.3", "rules p.1", "hostel p.7", "transport p.6"]
+        top, gap = (4.95, .5) if PHONE else (2.85, .62)
         def column(items, x, title):
-            head = label(title, 20, INK, "BOLD").move_to([x, 2.85, 0], aligned_edge=LEFT)
-            rows = VGroup(*[label(f"{i + 1}  {t}", 19, INK).move_to([x, 2.05 - i * .62, 0], aligned_edge=LEFT)
+            head = label(title, 20, INK, "BOLD").move_to([x, top, 0], aligned_edge=LEFT)
+            rows = VGroup(*[label(f"{i + 1}  {t}", 19, INK).move_to([x, top - .8 - i * gap, 0], aligned_edge=LEFT)
                             for i, t in enumerate(items)])
             return head, rows
-        dh, dr = column(dense, -6.75, "FAISS, dense")
-        sh, sr = column(sparse, -3.45, "BM25, keywords")
+        dh, dr = column(dense, L if PHONE else -6.75, "FAISS, dense")
+        sh, sr = column(sparse, .3 if PHONE else -3.45, "BM25, keywords")
         self.play(FadeIn(dh), FadeIn(sh), *[FadeIn(r, shift=RIGHT * .2) for r in [*dr, *sr]], run_time=1.4)
         links = VGroup(*[Line(dr[i].get_right() + RIGHT * .08, sr[j].get_left() + LEFT * .08, color=GOLD, stroke_width=3)
                          for i, a in enumerate(dense) for j, b in enumerate(sparse) if a == b])
@@ -156,21 +176,24 @@ class Rrf(Scene):
                 ranks.setdefault(t, []).append(r)
         score = {t: sum(1 / (K + r) for r in rs) for t, rs in ranks.items()}
         fused = sorted(ranks, key=lambda t: -score[t])
-        fh = label("fused: sum of 1 / (60 + rank)", 20, GOLD, "BOLD").move_to([.35, 2.85, 0], aligned_edge=LEFT)
+        fx, fy, tx, st = (L, .95, .45, .46) if PHONE else (.35, 2.85, 3.55, .5)   # fused list: left, header y, scores, row step
+        fh = label("fused: sum of 1 / (60 + rank)", 20, GOLD, "BOLD").move_to([fx, fy, 0], aligned_edge=LEFT)
         rows = VGroup()
         for i, t in enumerate(fused):
             both = len(ranks[t]) > 1
             terms = " + ".join(f"1/{K + r}" for r in ranks[t])
             rows.add(VGroup(label(f"{i + 1:>2}  {t}", 18, INK), label(f"{terms} = {score[t]:.4f}", 18, GOLD if both else INK3))
-                     .arrange(RIGHT, buff=.3).move_to([.35, 2.2 - i * .5, 0], aligned_edge=LEFT))
+                     .arrange(RIGHT, buff=.3).move_to([fx, fy - .65 - i * st, 0], aligned_edge=LEFT))
         for row in rows:
-            row[1].move_to([3.55, row.get_y(), 0], aligned_edge=LEFT)
+            row[1].move_to([tx, row.get_y(), 0], aligned_edge=LEFT)
         self.play(FadeIn(fh), run_time=.5)
         self.play(*[FadeIn(r, shift=LEFT * .3) for r in rows], lag_ratio=.12, run_time=2.2)
-        cut = DashedLine([.35, 2.2 - (KEEP - .5) * .5, 0], [6.85, 2.2 - (KEEP - .5) * .5, 0], color=INK3, dash_length=.1)
-        cl = label("top 8 go to the model", 18, INK3).move_to([6.85, 2.2 - len(fused) * .5, 0], aligned_edge=RIGHT)
+        right = 3.5 if PHONE else 6.85
+        cut = DashedLine([fx, fy - .65 - (KEEP - .5) * st, 0], [right, fy - .65 - (KEEP - .5) * st, 0], color=INK3, dash_length=.1)
+        cl = label("top 8 go to the model", 18, INK3).move_to([right, fy - .65 - len(fused) * st, 0], aligned_edge=RIGHT)
         self.play(Create(cut), FadeIn(cl), *[r.animate.set_opacity(.35) for r in rows[KEEP:]], run_time=.8)
-        win = label("passages both retrievers found rise to the top", 20, SAGE, "BOLD").to_edge(DOWN, buff=.35).align_to(dh, LEFT)
+        win = label("passages both retrievers found" + ("\n" if PHONE else " ") + "rise to the top", 20, SAGE, "BOLD")
+        win.to_edge(DOWN, buff=.35).align_to(dh, LEFT)
         self.play(*[r.animate.set_color(SAGE) for r, t in zip(rows, fused) if len(ranks[t]) > 1], FadeIn(win), run_time=.9)
         self.wait(3.2)
 
@@ -181,29 +204,31 @@ class Arena(Scene):
 
     def construct(self):
         n, c = 50, .082
-        origin = np.array([-6.55, 2.3, 0])
+        origin = np.array([-2.25, 4.4, 0]) if PHONE else np.array([-6.55, 2.3, 0])
         cells, inside = VGroup(), []
         for i in range(n):
             for j in range(i + 1, n):
                 cells.add(Dot(origin + np.array([j * c, -i * c, 0]), radius=.031, color=INK3))
                 inside.append(i // 10 == j // 10)
-        title = label("every pair of 50 images", 20, INK).move_to([-6.75, 2.95, 0], aligned_edge=LEFT)
-        count = label("1,225 matches", 22, ROSE, "BOLD").move_to([-6.75, -2.6, 0], aligned_edge=LEFT)
+        title = label("every pair of 50 images", 20, INK).move_to([L, 5.05, 0] if PHONE else [-6.75, 2.95, 0], aligned_edge=LEFT)
+        count = label("1,225 matches", 22, ROSE, "BOLD").move_to([L, 1.0, 0] if PHONE else [-6.75, -2.6, 0], aligned_edge=LEFT)
         self.play(FadeIn(title), FadeIn(cells, lag_ratio=.002), run_time=2.0)
         self.play(FadeIn(count), run_time=.5)
         self.wait(.8)
         title2 = label("only within each prompt group", 20, INK).move_to(title, aligned_edge=LEFT)
-        count2 = label("5 groups x 45 = 225 matches", 22, SAGE, "BOLD").move_to(count, aligned_edge=LEFT)
+        count2 = label("5 groups x 45" + ("\n" if PHONE else " ") + "= 225 matches", 22, SAGE, "BOLD").move_to(count, aligned_edge=LEFT)
         self.play(*[d.animate.set_opacity(.12) for d, k in zip(cells, inside) if not k],
                   *[d.animate.set_color(GOLD) for d, k in zip(cells, inside) if k],
                   FadeOut(title), FadeIn(title2), FadeOut(count), FadeIn(count2), run_time=1.6)
         self.wait(1.0)
 
-        R, names, x0 = {k: 1500.0 for k in "ABCD"}, "ABCD", .55
-        y = lambda k: 1.55 - names.index(k) * .72
-        head = label("Elo inside one group, K = 32", 20, INK, "BOLD").move_to([x0, 2.95, 0], aligned_edge=LEFT)
-        form = label("expected = 1 / (1 + 10^((Rb - Ra) / 400))", 18, INK3).move_to([x0, 2.45, 0], aligned_edge=LEFT)
-        bar = lambda k: Line([x0 + .5, y(k), 0], [x0 + .5 + (R[k] - 1400) / 200 * 3.9, y(k), 0], color=GOLD, stroke_width=14)
+        R, names, x0 = {k: 1500.0 for k in "ABCD"}, "ABCD", L if PHONE else .55
+        top = -.45 if PHONE else 2.95                     # Elo panel: below the triangle on a phone, beside it otherwise
+        y = lambda k: top - 1.4 - names.index(k) * (.62 if PHONE else .72)
+        head = label("Elo inside one group, K = 32", 20, INK, "BOLD").move_to([x0, top, 0], aligned_edge=LEFT)
+        form = label("expected = 1 / (1 + 10^((Rb - Ra) / 400))", 18, INK3).move_to([x0, top - .5, 0], aligned_edge=LEFT)
+        bar = lambda k: Line([x0 + .5, y(k), 0], [x0 + .5 + (R[k] - 1400) / 200 * (3.6 if PHONE else 3.9), y(k), 0],
+                             color=GOLD, stroke_width=14)
         num = lambda k: label(f"{R[k]:.0f}", 19, INK).next_to(bar(k), RIGHT, buff=.2)
         tags = VGroup(*[label(k, 20, INK, "BOLD").move_to([x0 + .15, y(k), 0]) for k in names])
         bars, nums = {k: bar(k) for k in names}, {k: num(k) for k in names}
@@ -214,14 +239,14 @@ class Arena(Scene):
             e = 1 / (1 + 10 ** ((R[b] - R[a]) / 400))
             s = 1.0 if win == a else 0.0
             R[a] += 32 * (s - e); R[b] -= 32 * (s - e)
-            new = label(f"{a} vs {b}: {win} wins", 19, INK3).move_to([x0, -1.5, 0], aligned_edge=LEFT)
+            new = label(f"{a} vs {b}: {win} wins", 19, INK3).move_to([x0, y("D") - (.75 if PHONE else .89), 0], aligned_edge=LEFT)
             fresh = {k: num(k) for k in (a, b)}
             self.play(*[bars[k].animate.become(bar(k)) for k in (a, b)],
                       *[FadeOut(nums[k]) for k in (a, b)], *[FadeIn(fresh[k]) for k in (a, b)],
                       *([FadeOut(note)] if note else []), FadeIn(new), run_time=.75)
             nums.update(fresh); note = new
             self.wait(.25)
-        bt = label("Bradley-Terry MLE then fits all matches", 19, SAGE, "BOLD").move_to([x0, -2.2, 0], aligned_edge=LEFT)
+        bt = label("Bradley-Terry MLE then fits all matches", 19, SAGE, "BOLD").move_to([x0, y("D") - (1.45 if PHONE else 1.59), 0], aligned_edge=LEFT)
         self.play(FadeIn(bt), run_time=.6)
         self.wait(3)
 
@@ -232,31 +257,38 @@ class Listen(Scene):
 
     def construct(self):
         rng = np.random.default_rng(11)
-        n, w, x0, base = 56, .2, -5.5, 1.0
+        n, w, x0, base = (32, .2, -3.1, 2.3) if PHONE else (56, .2, -5.5, 1.0)
         env = np.abs(np.convolve(rng.normal(0, 1, n + 6), np.ones(4) / 4, mode="same"))[3:n + 3]
         env = .25 + 1.3 * env / env.max()
         frames = VGroup(*[Line([x0 + i * w, base - env[i] / 2, 0], [x0 + i * w, base + env[i] / 2, 0], color=INK, stroke_width=6)
                           for i in range(n)])
-        title = label("Voxtral frame states, 12.5 per second", 20, INK3).move_to([-6.75, 3.0, 0], aligned_edge=LEFT)
+        title = label("Voxtral frame states, 12.5 per second", 20, INK3).move_to([L, 5.05 if PHONE else 3.0, 0], aligned_edge=LEFT)
         self.play(FadeIn(title), Create(frames, lag_ratio=.03), run_time=1.6)
 
         pool = VGroup(label("attention-weighted average", 19, GOLD), label("mean", 19, INK), label("standard deviation", 19, INK))
-        pool.arrange(DOWN, aligned_edge=LEFT, buff=.18).move_to([-3.2, -2.45, 0])
-        out = label("linear -> grammar score", 20, SAGE, "BOLD").move_to([3.4, -2.45, 0])
-        arrows = VGroup(*[Line(h.get_right() + RIGHT * .15, out.get_left() + LEFT * .15, color=INK3, stroke_width=2) for h in pool])
-        where = label("attention: where the grammar evidence is", 18, INK3).move_to([x0 - .1, -1.55, 0], aligned_edge=LEFT)
+        pool.arrange(DOWN, aligned_edge=LEFT, buff=.18)
+        if PHONE:
+            pool.move_to([L, -1.5, 0], aligned_edge=LEFT)
+            out = label("linear -> grammar score", 20, SAGE, "BOLD").move_to([0, -3.7, 0])
+            arrows = VGroup(*[Line([pool.get_right()[0] + .15, h.get_y(), 0], out.get_top() + UP * .15, color=INK3, stroke_width=2)
+                              for h in pool])
+        else:
+            pool.move_to([-3.2, -2.45, 0])
+            out = label("linear -> grammar score", 20, SAGE, "BOLD").move_to([3.4, -2.45, 0])
+            arrows = VGroup(*[Line(h.get_right() + RIGHT * .15, out.get_left() + LEFT * .15, color=INK3, stroke_width=2) for h in pool])
+        where = label("attention: where the grammar evidence is", 18, INK3).move_to([x0 - .1, base - 2.55, 0], aligned_edge=LEFT)
         attn = epoch = bracket = None
         t = np.arange(n)
-        for e, L in enumerate((34, 49, 41), 1):
-            br = Line([x0 - .1, base + 1.0, 0], [x0 + (L - 1) * w + .1, base + 1.0, 0], color=GOLD, stroke_width=4)
-            seg = label(f"epoch {e}: random test-length prefix, {L / 12.5:.1f} s", 19, GOLD).next_to(br, UP, buff=.15).align_to(br, LEFT)
-            peaks = rng.choice(np.arange(3, L - 3), 2, replace=False)
+        for e, L_ in enumerate((20, 28, 23) if PHONE else (34, 49, 41), 1):
+            br = Line([x0 - .1, base + 1.0, 0], [x0 + (L_ - 1) * w + .1, base + 1.0, 0], color=GOLD, stroke_width=4)
+            seg = label(f"epoch {e}: a random test-length prefix", 19, GOLD).next_to(br, UP, buff=.15).align_to(br, LEFT)
+            peaks = rng.choice(np.arange(3, L_ - 3), 2, replace=False)
             a = .1 + .25 * rng.random(n) + sum(np.exp(-((t - p) / 2.2) ** 2) for p in peaks)
-            a = a / a[:L].max()
+            a = a / a[:L_].max()
             new = VGroup(*[Line([x0 + i * w, base - 1.05, 0], [x0 + i * w, base - 1.05 - .95 * a[i], 0],
-                                color=GOLD, stroke_width=6) for i in range(L)])
+                                color=GOLD, stroke_width=6) for i in range(L_)])
             self.play(*[FadeOut(m) for m in (epoch, bracket, attn) if m], FadeIn(seg), Create(br),
-                      *[frames[i].animate.set_opacity(1 if i < L else .2) for i in range(n)], run_time=.8)
+                      *[frames[i].animate.set_opacity(1 if i < L_ else .2) for i in range(n)], run_time=.8)
             self.play(Create(new, lag_ratio=.02), run_time=1.1)
             if e == 1:
                 self.play(FadeIn(where), FadeIn(pool), *[Create(x) for x in arrows], FadeIn(out), run_time=1.0)
@@ -271,15 +303,17 @@ class Lora(Scene):
 
     def construct(self):
         from manim import Rectangle, Square
-        d, r, side = 3072, 16, 3.4
-        W = Square(side_length=side, color=INK3, stroke_width=2, fill_color=INK3, fill_opacity=.18).move_to([-4.85, -.2, 0])
+        d, r, side = 3072, 16, (2.6 if PHONE else 3.4)
+        W = Square(side_length=side, color=INK3, stroke_width=2, fill_color=INK3, fill_opacity=.18)
+        W.move_to([-1.95, 3.25, 0] if PHONE else [-4.85, -.2, 0])
         grid = VGroup(*[Line(W.get_corner(UL) + RIGHT * k * side / 10, W.get_corner(DL) + RIGHT * k * side / 10,
                              color=INK3, stroke_width=1, stroke_opacity=.35) for k in range(1, 10)])
         wl = label("W  d x d", 20, INK, "BOLD").next_to(W, UP, buff=.22)
         wc = label("frozen, 4-bit NF4", 19, INK3).next_to(W, DOWN, buff=.22)
         self.play(Create(W), FadeIn(grid), FadeIn(wl), FadeIn(wc), run_time=1.3)
-        plus = label("+", 36, INK).move_to([-2.65, -.2, 0])
-        B = Rectangle(width=.34, height=side, color=GOLD, fill_color=GOLD, fill_opacity=.6).move_to([-1.95, -.2, 0])
+        plus = label("+", 36, INK).move_to([-2.55, -1.55, 0] if PHONE else [-2.65, -.2, 0])
+        B = Rectangle(width=.34, height=side, color=GOLD, fill_color=GOLD, fill_opacity=.6)
+        B.move_to([-1.75, -1.55, 0] if PHONE else [-1.95, -.2, 0])
         BA = Square(side_length=side, color=GOLD, stroke_width=2, fill_color=GOLD, fill_opacity=.22)
         BA.next_to(B, RIGHT, buff=.3)
         A = Rectangle(width=side, height=.34, color=GOLD, fill_color=GOLD, fill_opacity=.6).next_to(BA, UP, buff=.3)
@@ -288,6 +322,8 @@ class Lora(Scene):
         self.play(FadeIn(plus), FadeIn(B, shift=RIGHT * .3), FadeIn(bl), run_time=.8)
         self.play(FadeIn(A, shift=DOWN * .3), FadeIn(al), run_time=.8)
         bal = label("B A, rank 16", 19, GOLD).next_to(BA, DOWN, buff=.22)
+        if PHONE:
+            bal.align_to(BA, RIGHT)
         self.play(Create(BA), FadeIn(bal), run_time=1.2)
         rows = VGroup(
             label(f"example d = {d:,}", 18, INK3),
@@ -295,7 +331,8 @@ class Lora(Scene):
             label(f"trained  {2 * d * r:>9,}", 19, GOLD, "BOLD"),
             label(f"share    {2 * d * r / (d * d):>9.2%}", 19, SAGE, "BOLD"),
             label("on q, k, v and o", 18, INK3),
-        ).arrange(DOWN, aligned_edge=LEFT, buff=.22).move_to([5.45, -.2, 0])
+        ).arrange(DOWN, aligned_edge=LEFT, buff=.22)
+        rows.move_to([.05, 3.25, 0], aligned_edge=LEFT) if PHONE else rows.move_to([5.45, -.2, 0])
         for row in rows:
             self.play(FadeIn(row, shift=LEFT * .2), run_time=.4)
         self.wait(3)
@@ -309,26 +346,32 @@ class Prune(Scene):
         from manim import Square
         rng = np.random.default_rng(5)
         runs = [("0.01", 40, "100%", "93.08%"), ("0.03", 20, "100%", "91.93%"), ("0.10", 10, "99.99%", "84.06%")]
-        k, size = 14, .2
+        k, size = (12, .17) if PHONE else (14, .2)
         epoch = ValueTracker(0)
         panels = VGroup()
         for p, (lam, done, sp, acc) in enumerate(runs):
-            cx = -4.6 + p * 4.6
+            cx, cy = (-2.2, 3.35 - p * 2.75) if PHONE else (-4.6 + p * 4.6, 2.0)
             drop = rng.uniform(.25, .95, k * k) * done          # epoch at which each gate falls under 0.01
             cells = VGroup()
             for i in range(k * k):
                 sq = Square(side_length=size * .8, stroke_width=1, stroke_color=INK3, stroke_opacity=.5,
                             fill_color=INK, fill_opacity=.88)
-                sq.move_to([cx - (k - 1) * size / 2 + (i % k) * size, 2.0 - (i // k) * size, 0])
+                sq.move_to([cx - (k - 1) * size / 2 + (i % k) * size, cy + (k - 1) * size / 2 * PHONE - (i // k) * size, 0])
                 sq.add_updater(lambda m, t0=drop[i]: m.set_fill(opacity=.85 / (1 + np.exp((epoch.get_value() - t0) * 1.1)) + .02))
                 cells.add(sq)
-            panels.add(VGroup(label(f"lambda = {lam}", 20, INK, "BOLD").move_to([cx, 2.9, 0]), cells))
-        note = label("classifier-head gates, g = sigmoid(s), starting at 0.88", 18, INK3).to_edge(DOWN, buff=.3)
-        ep = always_redraw(lambda: label(f"epoch {int(epoch.get_value()):>3} of 100", 20, GOLD, "BOLD").move_to([0, -.95, 0]))
+            name = label(f"lambda = {lam}", 20, INK, "BOLD")
+            name.move_to([-.85, cy + .75, 0], aligned_edge=LEFT) if PHONE else name.move_to([cx, 2.9, 0])
+            panels.add(VGroup(name, cells))
+        note = label("classifier-head gates, g = sigmoid(s)," + ("\n" if PHONE else " ") + "starting at 0.88", 18, INK3)
+        note.to_edge(DOWN, buff=.3)
+        ep = always_redraw(lambda: label(f"epoch {int(epoch.get_value()):>3} of 100", 20, GOLD, "BOLD")
+                           .move_to([L, 5.1, 0] if PHONE else [0, -.95, 0], aligned_edge=LEFT if PHONE else ORIGIN))
         self.play(FadeIn(panels), FadeIn(note), FadeIn(ep), run_time=1.2)
         self.play(epoch.animate.set_value(45), run_time=6, rate_func=linear)
         res = VGroup(*[VGroup(label(f"{sp} pruned by epoch {done}", 18, SAGE), label(f"test accuracy {acc}", 20, INK, "BOLD"))
-                       .arrange(DOWN, buff=.12).move_to([-4.6 + p * 4.6, -1.85, 0]) for p, (lam, done, sp, acc) in enumerate(runs)])
+                       .arrange(DOWN, buff=.12, aligned_edge=LEFT if PHONE else ORIGIN)
+                       .move_to([-.85, 3.35 - p * 2.75 - .15, 0] if PHONE else [-4.6 + p * 4.6, -1.85, 0], aligned_edge=LEFT if PHONE else ORIGIN)
+                       for p, (lam, done, sp, acc) in enumerate(runs)])
         self.play(FadeIn(res, lag_ratio=.3), epoch.animate.set_value(100), run_time=2.2, rate_func=linear)
         self.wait(3.2)
 
@@ -342,8 +385,8 @@ class Judge(Scene):
         writer = label("writer  llama-3.1-8b-instant", 19, INK)
         judge = label("judge  llama-3.3-70b-versatile", 19, SAGE, "BOLD")
         temp = label("temperature 0.0", 19, SAGE)
-        writer.move_to([-6.75, 1.9, 0], aligned_edge=LEFT)
-        judge.move_to([-6.75, .1, 0], aligned_edge=LEFT)
+        writer.move_to([L + .15, 4.85, 0] if PHONE else [-6.75, 1.9, 0], aligned_edge=LEFT)
+        judge.move_to([L + .15, 3.45, 0] if PHONE else [-6.75, .1, 0], aligned_edge=LEFT)
         temp.next_to(judge, DOWN, buff=.15).align_to(judge, LEFT)
         boxes = VGroup(SurroundingRectangle(writer, color=INK3, buff=.18, stroke_width=2),
                        SurroundingRectangle(VGroup(judge, temp), color=SAGE, buff=.18, stroke_width=2))
@@ -356,14 +399,16 @@ class Judge(Scene):
         self.wait(.6)
 
         acc = [.923, .974, .974, .872, .872]
-        ax = Axes(x_range=[.5, 5.5, 1], y_range=[.85, 1.0, .05], x_length=5.6, y_length=4.2, tips=False,
-                  axis_config={"color": INK3, "stroke_width": 2}).move_to([3.7, -.25, 0])
+        ax = Axes(x_range=[.5, 5.5, 1], y_range=[.85, 1.0, .05], x_length=5.6, y_length=3.4 if PHONE else 4.2, tips=False,
+                  axis_config={"color": INK3, "stroke_width": 2}).move_to([.5, -1.0, 0] if PHONE else [3.7, -.25, 0])
         yt = VGroup(*[label(f"{v:.2f}", 17).next_to(ax.c2p(.5, v), LEFT, buff=.15) for v in (.85, .90, .95, 1.0)])
         xt = VGroup(*[label(f"{r}", 16).next_to(ax.c2p(r, .85), DOWN, buff=.15) for r in range(1, 6)],
                     label("evaluation round", 16).next_to(ax, DOWN, buff=.5))
         head = label("refusal accuracy per round", 19, INK).next_to(ax, UP, buff=.35).align_to(ax, LEFT)
         target = DashedLine(ax.c2p(.5, .95), ax.c2p(5.5, .95), color=INK3, dash_length=.1)
         tl = label("target 0.95", 16).next_to(ax.c2p(5.5, .95), UP, buff=.08).align_to(ax.c2p(5.5, .95), RIGHT)
+        if PHONE:
+            tl.next_to(ax.c2p(.5, .95), UP, buff=.08).align_to(ax.c2p(.6, .95), LEFT)
         self.play(Create(ax), FadeIn(yt), FadeIn(xt), FadeIn(head), Create(target), FadeIn(tl), run_time=1.1)
         dots = VGroup()
         for r, v in enumerate(acc, 1):
@@ -375,10 +420,12 @@ class Judge(Scene):
                        Line(ax.c2p(4.5, .872), ax.c2p(4.7, .872), color=GOLD, stroke_width=4))
         link = DashedLine(ax.c2p(3, .974), ax.c2p(4.5, .974), color=GOLD, dash_length=.08, stroke_width=2)
         same = label("rounds 3 and 5: same setup", 18, GOLD, "BOLD").next_to(own, DOWN, buff=.45).align_to(own, LEFT)
+        if PHONE:
+            same.move_to([L, -4.05, 0], aligned_edge=LEFT)
         noise = label("noise at temperature 0.05: about 0.10", 18, GOLD).next_to(same, DOWN, buff=.1).align_to(same, LEFT)
         self.play(Create(link), Create(gap), Create(ticks), FadeIn(same), run_time=1.0)
         self.play(FadeIn(noise), run_time=.6)
-        fix = label("so the harness now runs at 0.0", 18, SAGE, "BOLD").next_to(noise, DOWN, buff=.3).align_to(own, LEFT)
+        fix = label("so the harness now runs at 0.0", 18, SAGE, "BOLD").next_to(noise, DOWN, buff=.3 if not PHONE else .15).align_to(own, LEFT)
         self.play(Create(strike), FadeIn(fix), run_time=.8)
         self.wait(3)
 
@@ -390,7 +437,7 @@ class Chain(Scene):
 
     def construct(self):
         from manim import Rectangle
-        x0, unit, y1, y2 = -1.5, .6, 1.15, -1.05
+        x0, unit, y1, y2 = (-3.35, .48, 1.95, -.95) if PHONE else (-1.5, .6, 1.15, -1.05)
         X = lambda v: x0 + v * unit
         def bar(t0, t1, y, colour, text, fill=.85, size=15):
             r = Rectangle(width=(t1 - t0) * unit, height=.5, stroke_width=0, fill_color=colour, fill_opacity=fill)
@@ -401,14 +448,17 @@ class Chain(Scene):
         n2 = VGroup(label("retrieve, prompt, stream", 19, SAGE, "BOLD"), label("1 LLM request per turn", 17, INK3),
                     label("search: previous + new question", 17, INK3))
         for g, y in ((n1, y1), (n2, y2)):
-            g.arrange(DOWN, aligned_edge=LEFT, buff=.1).move_to([-6.8, y, 0], aligned_edge=LEFT)
-        q = label('a follow-up arrives: "and the hostel fee?"', 19, INK).move_to([-6.8, 3.0, 0], aligned_edge=LEFT)
-        axis = Line([X(0), -2.3, 0], [X(14), -2.3, 0], color=INK3, stroke_width=2)
+            g.arrange(DOWN, aligned_edge=LEFT, buff=.1)
+            g.move_to([L, y + 1.15, 0], aligned_edge=LEFT) if PHONE else g.move_to([-6.8, y, 0], aligned_edge=LEFT)
+        q = label('a follow-up arrives:' + ("\n" if PHONE else " ") + '"and the hostel fee?"', 19, INK)
+        q.move_to([L, 4.85 if PHONE else 3.0, 0], aligned_edge=LEFT)
+        ax_y = -2.75 if PHONE else -2.3
+        axis = Line([X(0), ax_y, 0], [X(14), ax_y, 0], color=INK3, stroke_width=2)
         al = label("time", 16).next_to(axis, DOWN, buff=.12).align_to(axis, RIGHT)
         self.play(FadeIn(q), FadeIn(n1), FadeIn(n2), Create(axis), FadeIn(al), run_time=1.1)
 
         t = ValueTracker(0)
-        cursor = always_redraw(lambda: Line([X(t.get_value()), 2.1, 0], [X(t.get_value()), -2.3, 0], color=GOLD,
+        cursor = always_redraw(lambda: Line([X(t.get_value()), y1 + .45 if PHONE else 2.1, 0], [X(t.get_value()), ax_y, 0], color=GOLD,
                                             stroke_width=2, stroke_opacity=.6))
         # the streamed answer fills in as it is generated
         grow = always_redraw(lambda: Rectangle(width=max(min(t.get_value(), 9.5) - 1.5, .001) * unit, height=.5, stroke_width=0,
@@ -428,7 +478,8 @@ class Chain(Scene):
         self.play(Create(wait), t.animate.set_value(13.5), run_time=4.2, rate_func=linear)
         done = label("whole answer at once", 16, ROSE).move_to([X(13.5), y1 - .55, 0], aligned_edge=RIGHT)
         self.play(FadeIn(answer1), FadeIn(done), run_time=.5)
-        note = label("Groq free tier: 6,000 tokens per minute, shared by every visitor", 16, INK3).move_to([-6.8, -3.05, 0], aligned_edge=LEFT)
+        note = label("Groq free tier: 6,000 tokens per minute," + ("\n" if PHONE else " ") + "shared by every visitor", 16, INK3)
+        note.move_to([L, -3.75 if PHONE else -3.05, 0], aligned_edge=LEFT)
         self.play(FadeIn(note), run_time=.5)
         self.wait(3)
 
@@ -442,12 +493,19 @@ class Retrieval(Scene):
         rows = [("Dense MMR, k = 6", 77.1, 0, "none"), ("BM25 only, top 8", 80.0, 0, "none"),
                 ("Dense + reranker, top 8", 88.6, 2.0, "+2.0 s"), ("Hybrid dense + BM25, top 8", 88.6, 0, "none"),
                 ("Hybrid + reranker, top 8", 85.7, 1.4, "+1.4 s"), ("Hybrid, top 16", 91.4, 0, "none")]
-        bx, span, lx = -2.55, 5.0, 4.35                    # bar start, width of 100%, latency column
-        y = lambda i: 1.9 - i * .8
-        h1 = label("fact reaches the context", 18, INK3).move_to([bx, 2.85, 0], aligned_edge=LEFT)
-        h2 = label("added latency", 18, INK3).move_to([lx, 2.85, 0], aligned_edge=LEFT)
-        names = VGroup(*[label(r[0], 18, INK).move_to([-6.8, y(i), 0], aligned_edge=LEFT) for i, r in enumerate(rows)])
-        base = Line([bx, 2.4, 0], [bx, y(5) - .4, 0], color=INK3, stroke_width=2)
+        if PHONE:                                          # each name sits above its bar
+            bx, span, lx, top = L, 4.2, 2.45, 4.95
+            y = lambda i: 3.85 - i * 1.05
+            ny = lambda i: y(i) + .42
+        else:
+            bx, span, lx, top = -2.55, 5.0, 4.35, 2.85     # bar start, width of 100%, latency column, header row
+            y = ny = lambda i: 1.9 - i * .8
+        h1 = label("fact reaches the context", 18, INK3).move_to([bx, top, 0], aligned_edge=LEFT)
+        h2 = label("added latency", 18, INK3).move_to([lx, top, 0], aligned_edge=LEFT)
+        if PHONE:
+            h2.move_to([3.6, top, 0], aligned_edge=RIGHT)
+        names = VGroup(*[label(r[0], 18, INK).move_to([L, ny(i), 0], aligned_edge=LEFT) for i, r in enumerate(rows)])
+        base = Line([bx, top - .45, 0], [bx, y(5) - .4, 0], color=INK3, stroke_width=2)
         self.play(FadeIn(h1), FadeIn(h2), FadeIn(names, lag_ratio=.1), Create(base), run_time=1.2)
 
         bars, vals = VGroup(), VGroup()
@@ -460,7 +518,9 @@ class Retrieval(Scene):
         self.play(*[GrowFromEdge(b, LEFT) for b in bars], *[FadeIn(v) for v in vals], lag_ratio=.15, run_time=2.2)
         lats = VGroup()
         for i, (name, v, lat, ltxt) in enumerate(rows):
-            if lat:
+            if lat and PHONE:
+                lats.add(label(ltxt, 18, ROSE, "BOLD").move_to([lx, y(i), 0], aligned_edge=LEFT))
+            elif lat:
                 r = Rectangle(width=lat * .75, height=.42, stroke_width=0, fill_color=ROSE, fill_opacity=.85)
                 r.move_to([lx, y(i), 0], aligned_edge=LEFT)
                 lats.add(VGroup(r, label(ltxt, 18, ROSE).next_to(r, RIGHT, buff=.12)))
@@ -471,15 +531,19 @@ class Retrieval(Scene):
 
         tie = VGroup(Line(bars[2].get_right() + RIGHT * .95, bars[3].get_right() + RIGHT * .95, color=GOLD, stroke_width=4))
         tl = label("same 88.6%", 18, GOLD, "BOLD").next_to(tie, RIGHT, buff=.15)
+        if PHONE:
+            tie = VGroup()
+            tl = label("same 88.6%, no added latency", 17, GOLD, "BOLD").move_to([L, -2.85, 0], aligned_edge=LEFT)
         self.play(Create(tie), FadeIn(tl), *[b.animate.set_fill(GOLD) for b in bars[2:4]], run_time=.9)
         self.wait(.8)
-        worse = label("reranker on top made it worse", 17, ROSE).move_to([-6.8, -2.95, 0], aligned_edge=LEFT)
+        worse = label("reranker on top made it worse", 17, ROSE).move_to([L, -3.6 if PHONE else -2.95, 0], aligned_edge=LEFT)
         self.play(bars[4].animate.set_fill(ROSE, opacity=.7), FadeIn(worse), run_time=.8)
-        tokens = label("top 16: +2.8 points for twice the context tokens", 17, INK3).next_to(worse, DOWN, buff=.1).align_to(worse, LEFT)
+        tokens = label("top 16: +2.8 points for" + ("\n" if PHONE else " ") + "twice the context tokens", 17, INK3)
+        tokens.next_to(worse, DOWN, buff=.1).align_to(worse, LEFT)
         self.play(bars[5].animate.set_fill(INK3, opacity=.6), FadeIn(tokens), run_time=.8)
-        ship = label("shipped", 18, SAGE, "BOLD").next_to(lats[3], RIGHT, buff=.3)
+        ship = label("shipped", 18, SAGE, "BOLD").next_to(names[3] if PHONE else lats[3], RIGHT, buff=.3)
         self.play(bars[3].animate.set_fill(SAGE), names[3].animate.set_color(SAGE), vals[3].animate.set_color(SAGE),
-                  FadeIn(ship), FadeOut(tie), FadeOut(tl), bars[2].animate.set_fill(INK), run_time=1.0)
+                  FadeIn(ship), *([] if PHONE else [FadeOut(tie), FadeOut(tl)]), bars[2].animate.set_fill(INK), run_time=1.0)
         self.wait(3)
 
 
@@ -489,7 +553,7 @@ class Verbatim(Scene):
 
     def construct(self):
         rng = np.random.default_rng(7)
-        n, x0, x1, mid = 120, -6.0, 6.0, 1.75
+        n, x0, x1, mid = (70, -3.3, 3.3, 3.45) if PHONE else (120, -6.0, 6.0, 1.75)
         words = [("he", .04, .12, .7), ("don't", .19, .40, 1.0), ("like", .47, .66, .8), ("it", .73, .82, .65)]
         xs = np.linspace(x0, x1, n)
         amp = .05 + .07 * rng.random(n)
@@ -503,16 +567,16 @@ class Verbatim(Scene):
                              stroke_width=4) for i in range(n)])
         names = VGroup(*[label(w, 20, GOLD if w == "don't" else INK, "BOLD" if w == "don't" else "NORMAL")
                          .move_to([x0 + (a + b) / 2 * (x1 - x0), mid - 1.25, 0]) for w, a, b, _ in words])
-        said = label("what the speaker said", 18, INK3).move_to([-6.8, 3.15, 0], aligned_edge=LEFT)
+        said = label("what the speaker said", 18, INK3).move_to([L, 4.95 if PHONE else 3.15, 0], aligned_edge=LEFT)
         self.play(FadeIn(said), Create(bars, lag_ratio=.01), run_time=1.6)
         self.play(FadeIn(names, lag_ratio=.25), run_time=1.0)
         self.wait(.4)
 
-        ys, tx = (-.55, -1.55, -2.55), -1.3
+        ys, tx = ((.75, -1.15, -3.05), L) if PHONE else ((-.55, -1.55, -2.55), -1.3)
         rows = VGroup(label("default Whisper", 18, INK3), label("Whisper, verbatim prompt", 18, INK3),
                       label("audio models, no transcript", 18, INK3))
         for r, y in zip(rows, ys):
-            r.move_to([-6.8, y, 0], aligned_edge=LEFT)
+            r.move_to([L, y + .5 * PHONE, 0], aligned_edge=LEFT)
         sx = ValueTracker(x0 - .2)
         scan = always_redraw(lambda: Line([sx.get_value(), mid + 1.05, 0], [sx.get_value(), ys[2] - .3, 0],
                                           color=GOLD, stroke_width=2, stroke_opacity=.55))
@@ -534,7 +598,11 @@ class Verbatim(Scene):
         strike = Line(d_line[1].get_left(), d_line[1].get_right(), color=ROSE, stroke_width=3)
         lost = label("the error is corrected away", 18, ROSE).next_to(d_line, RIGHT, buff=.5)
         kept = label("the error is kept", 18, SAGE, "BOLD").next_to(v_line, RIGHT, buff=.5).align_to(lost, LEFT)
-        hears = label("hears how it was said: WavLM, Voxtral", 18, SAGE, "BOLD").move_to([tx, ys[2], 0], aligned_edge=LEFT)
+        if PHONE:
+            lost.next_to(d_line, DOWN, buff=.15).align_to(d_line, LEFT)
+            kept.next_to(v_line, DOWN, buff=.15).align_to(v_line, LEFT)
+        hears = label("hears how it was said: WavLM, Voxtral", 18, SAGE, "BOLD")
+        hears.move_to([tx, ys[2], 0], aligned_edge=LEFT)
         self.play(Create(strike), FadeIn(lost), run_time=.8)
         self.play(FadeIn(kept), run_time=.6)
         self.play(FadeIn(hears), run_time=.6)

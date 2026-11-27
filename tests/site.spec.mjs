@@ -1,6 +1,6 @@
 // Browser checks on a phone and a desktop, in both themes:
-// no console errors, no sideways scroll, the hands render, the theme toggle sticks,
-// and axe finds no serious or critical accessibility violations.
+// no console errors, no sideways scroll, the hands render, every animation file loads, the theme toggle
+// sticks, and axe finds no serious or critical accessibility violations.
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
@@ -27,6 +27,12 @@ for (const size of sizes) {
 
       const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(scrollWidth).toBeLessThanOrEqual(size.width);
+
+      // every clip and poster the page asks for at this size exists (phones get the portrait renders)
+      const media = await page.evaluate(() => [...document.querySelectorAll("video.anim")].flatMap((v) => [v.querySelector("source").src, v.poster]));
+      expect(media.length).toBeGreaterThan(0);
+      if (size.name === "phone") expect(media.every((u) => u.includes("-phone."))).toBe(true);
+      for (const url of media) expect((await page.request.head(url)).status(), url).toBe(200);
 
       const axe = await new AxeBuilder({ page }).exclude(".art").analyze();
       const serious = axe.violations.filter((v) => ["serious", "critical"].includes(v.impact));

@@ -298,7 +298,8 @@ figure { margin: 22px 0; }
 .plate { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 22px 0 18px; }
 /* Manim renders on black: lighten drops the black on charcoal; the light theme inverts it and darken drops the white */
 .plate:has(> .anim) { background: var(--bg); }     /* the backdrop the blend works against */
-.anim { display: block; width: 100%; height: auto; mix-blend-mode: lighten; }
+.anim { display: block; width: 100%; height: auto; aspect-ratio: 2 / 1; mix-blend-mode: lighten; }
+@media (max-width: 640px) { .anim { aspect-ratio: 2 / 3; } }   /* phones get the portrait renders (see the script) */
 :root[data-theme="light"] .anim { filter: invert(1) hue-rotate(180deg); mix-blend-mode: darken; }
 .motion { margin: 18px 0 0 52px; }
 @media (max-width: 560px) { .motion { margin-left: 0; } }
@@ -1057,6 +1058,15 @@ middle layer: mean of audio tokens + last position
   }, 200);
 
   /* ---------- Manim clips (projects and Method figures): play at 1.2x only while on screen; reduced motion keeps the final frame ---------- */
+  // phones load the portrait render of each clip, laid out for a narrow column; nothing has loaded yet (preload="none")
+  if (window.matchMedia("(max-width: 640px)").matches) {
+    document.querySelectorAll("video.anim").forEach(function (v) {
+      var src = v.querySelector("source");
+      src.src = src.getAttribute("src").replace(/\.mp4$/, "-phone.mp4");
+      v.poster = v.getAttribute("poster").replace(/\.webp$/, "-phone.webp");
+      v.load();
+    });
+  }
   if (!reduce && "IntersectionObserver" in window) {
     var vio = new IntersectionObserver(function (es) {
       es.forEach(function (e) {

@@ -34,7 +34,7 @@ A single static page with no framework and no build step at runtime.
 | `portrait-*.jpg/.webp` | Portrait for the About section, 480 and 960 px. |
 | `fonts/` | Clash Display (Fontshare, ITF Free Font License), self-hosted. |
 | `src/manim/` | [Manim](https://www.manim.community/) scenes (MIT): one per project card and Fig. 1 to Fig. 6 in the Method section, plus the script that renders them. |
-| `media/` | The rendered clips (`.mp4`) and their last frames (`.webp`, the poster and the reduced-motion still). |
+| `media/` | The rendered clips (`.mp4`) and their last frames (`.webp`, the poster and the reduced-motion still). Each has a `-phone` portrait version that screens up to 640 px wide load instead, so the labels stay readable. |
 
 ## Editing
 
