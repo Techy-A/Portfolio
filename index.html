@@ -165,6 +165,13 @@ kbd { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
   background: radial-gradient(circle, var(--glow) 0, transparent 70%); animation: spark 2.4s ease-in-out infinite; }
 .art.noise .spark { opacity: 0; }
 @keyframes spark { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+/* the hands react: pointer heat scrambles the characters, a tap sends a pulse from God's fingertip */
+.art.live { cursor: crosshair; touch-action: pan-y; }
+.spark { transform: scale(calc(1 + var(--near, 0) * 1.6)); transition: transform .3s var(--ease); }
+.spark::before { content: ""; position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%;
+  border: 1px solid var(--accent); opacity: 0; }
+.spark.fire::before { animation: fire .9s var(--ease); }
+@keyframes fire { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(9); } }
 
 .hero-copy { position: relative; max-width: 900px; margin: -2vw auto 0; padding: 0 4px; }
 .pill { display: inline-flex; align-items: center; gap: 9px; font: 12px var(--mono); color: var(--ink-2); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 13px; }
@@ -277,7 +284,15 @@ kbd { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
 .pipe { margin: 18px 0 0 52px; padding: 16px 0 0; border-top: 1px dashed var(--rule); }
 @media (max-width: 560px) { .pipe { margin-left: 0; } }
 .pipe pre { font-size: 12px; color: var(--ink-3); }
-.pipe pre b { color: var(--ink); font-weight: 700; }
+.pipe pre b { color: var(--ink); font-weight: 700; transition: color 1.1s var(--ease), opacity .25s; }
+/* a gold packet runs each diagram from input to output; hover a step to trace its row */
+.pipe .f { transition: color 1.1s var(--ease), text-shadow 1.1s var(--ease), opacity .25s; }
+.pipe .f.on { color: var(--accent); text-shadow: 0 0 10px var(--glow); transition: none; }
+.pipe b.on { color: var(--accent); transition: none; }
+.pipe pre b { cursor: default; }
+.pipe pre.focus { color: color-mix(in oklch, var(--ink-3) 50%, transparent); }
+.pipe pre.focus b:not(.lit), .pipe pre.focus .f:not(.lit) { opacity: .35; }
+.pipe pre.focus .lit { color: var(--accent); }
 .more { margin: 32px 0 0; font-size: 16px; color: var(--ink-2); }
 .more ul { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
 .more li a { display: inline-block; padding: 4px 0; }
@@ -392,7 +407,7 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
           <a class="btn" href="mailto:aryanawasthi017@gmail.com">Email me</a>
         </div>
         <p class="links"><a href="https://www.linkedin.com/in/aryan--awasthi">LinkedIn</a><span aria-hidden="true">/</span><a href="https://github.com/Techy-A">GitHub</a><span aria-hidden="true">/</span><a href="https://www.kaggle.com/aryanawasthiteykik">Kaggle</a></p>
-        <p class="sample"><span>The hands are denoised from noise in 40 steps, like a diffusion sampler.</span><output id="tstep" aria-live="off">t = 0</output><button type="button" id="resample">Sample again</button></p>
+        <p class="sample"><span>The hands are denoised from noise in 40 steps, like a diffusion sampler. Touch them to add noise back.</span><output id="tstep" aria-live="off">t = 0</output><button type="button" id="resample">Sample again</button></p>
       </div>
 
       <aside class="card" aria-labelledby="card-h">
@@ -464,32 +479,40 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
                 <dt>Limit</dt><dd>Refusal accuracy is 0.87 to 0.97 against a 0.95 target. Older documents sometimes outrank current ones, so per-document authority weighting is the next measured change.</dd>
               </dl>
             </div>
-            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline diagram"><pre aria-hidden="true">question
+            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline: the question and the previous question go to FAISS dense search and BM25 keyword search, top 30 each. Reciprocal rank fusion keeps the best 8 passages, and Llama 3.1 8B on Groq writes an answer citing source and page, or refuses."><pre aria-hidden="true">question + previous question
    |
-   +--&gt; <b>FAISS</b> (dense) ---+
-   |                      +--&gt; reciprocal rank fusion
-   +--&gt; <b>BM25</b> (sparse) ---+            |
-                                       v
-                        <b>Llama 3.1</b> on Groq
-                                       |
-                    cited answer  or  refusal</pre></div>
+   +--&gt; <b>FAISS</b> (dense)  top 30 ---+
+   |                             +--&gt; <b>rank fusion</b> (RRF)
+   +--&gt; <b>BM25</b> (sparse)  top 30 ---+     top 8 passages
+                                             |
+                                             v
+                                   <b>Llama 3.1 8B</b> on Groq
+                                             |
+                                             v
+                                 cited answer  or  refusal</pre></div>
           </li>
           <li class="proj">
             <div>
               <h3><a href="https://github.com/Techy-A/shl-grammar-scoring">Spoken grammar scoring<span class="ext">shl-grammar-scoring</span></a></h3>
               <dl class="case">
                 <dt>Problem</dt><dd>Predict a 0 to 5 grammar score from 45 to 60 seconds of spontaneous speech, when speech recognisers correct the errors by default.</dd>
-                <dt>Result</dt><dd>Verbatim transcripts, frozen speech encoders and an audio language model, blended. Out-of-fold Pearson r of <strong>0.909</strong> on speaker-grouped folds.</dd>
+                <dt>Result</dt><dd>Each clip is read three ways: verbatim transcripts into DeBERTa-v3-large, speech encoder embeddings, and an audio language model with an attention-pooling head, combined in a non-negative blend. Out-of-fold Pearson r of <strong>0.915</strong> and RMSE 0.500 on speaker-grouped folds.</dd>
                 <dt>Limit</dt><dd>Test clips run shorter than training clips, so every model had to be retrained on test-length crops to stay calibrated.</dd>
               </dl>
             </div>
-            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline diagram"><pre aria-hidden="true">audio clip
+            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline: each clip goes three ways. Whisper with a verbatim prompt feeds DeBERTa-v3-large, frozen and fine-tuned. WavLM, WavLM-large and Whisper encoder embeddings feed ridge and SVR. Voxtral-Mini-3B states feed a ridge and an attention-pooling head. A non-negative blend combines them, a WavLM gate sets noise recordings to 0, then a measured test bias is removed and full-length clips are stretched, giving a score from 0 to 5."><pre aria-hidden="true">audio clip
    |
-   +--&gt; <b>Whisper</b>, verbatim --&gt; DeBERTa --+
-   +--&gt; <b>WavLM</b> + Whisper encoder --------+--&gt; blend
-   +--&gt; <b>Voxtral-Mini-3B</b> states ---------+      |
-   |                                           v
-   +--&gt; WavLM gate --&gt; score-0 clips      0 to 5</pre></div>
+   +--&gt; <b>Whisper</b>, verbatim --&gt; <b>DeBERTa-v3-large</b> ---------+
+   +--&gt; <b>WavLM</b>, WavLM-large, Whisper enc --&gt; ridge, SVR -+
+   +--&gt; <b>Voxtral-Mini-3B</b> --&gt; ridge, attention pool ------+
+   |                                                    |
+   +--&gt; <b>WavLM gate</b> --&gt; noise clips = 0                  v
+                                       <b>non-negative blend</b>
+                                                        |
+                  test bias removed, full clips stretched
+                                                        |
+                                                        v
+                                                   0 to 5</pre></div>
           </li>
           <li class="proj">
             <div>
@@ -500,7 +523,7 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
                 <dt>Limit</dt><dd>Ratings are comparable within a prompt group, not across groups.</dd>
               </dl>
             </div>
-            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline diagram"><pre aria-hidden="true">prompt group --&gt; images A B C D
+            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline: images from one prompt are paired round-robin, five scorers judge each pair (PickScore, HPSv2, ImageReward, VQAScore and a VLM judge), and Elo with Bradley-Terry maximum likelihood turns the results into a ranking."><pre aria-hidden="true">prompt group --&gt; images A B C D
                       |
              round-robin pairs  (A,B) (A,C) ...
                       |
@@ -514,19 +537,22 @@ dialog.cmd::backdrop { background: rgba(0, 0, 0, .55); }
             <div>
               <h3><a href="https://github.com/Techy-A/LORA_for_GPU">Audio LLM grammar scorer<span class="ext">LORA_for_GPU</span></a></h3>
               <dl class="case">
-                <dt>Problem</dt><dd>Fine-tune Voxtral-Mini-3B, an audio language model, to score spoken grammar on a consumer GPU, as one more model for the spoken grammar blend.</dd>
+                <dt>Problem</dt><dd>Fine-tune Voxtral-Mini-3B, an audio language model, to score spoken grammar on a consumer GPU. It was built as a candidate for the spoken grammar blend; validation rejected it, so the blend keeps frozen Voxtral features with an attention-pooling head.</dd>
                 <dt>Result</dt><dd>4-bit NF4 weights with LoRA adapters fit an <strong>8&nbsp;GB GPU</strong>. Speaker-grouped 5-fold cross-validation keeps the out-of-fold predictions honest.</dd>
                 <dt>Limit</dt><dd>A full run takes about 3 to 5 hours, and the model trains on 30-second crops, so longer test clips are scored in windows.</dd>
               </dl>
             </div>
-            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline diagram"><pre aria-hidden="true">audio clip
+            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline: a 30-second audio crop followed by the grammar rubric goes into Voxtral-Mini-3B loaded in 4-bit NF4 with the audio encoder frozen and LoRA adapters of rank 16 on the attention projections. A head reads the middle layer, the mean over audio tokens plus the last position, and a linear layer gives a score from 0 to 5."><pre aria-hidden="true">30 s audio crop + grammar rubric
    |
    v
 <b>Voxtral-Mini-3B</b>      4-bit NF4, audio encoder frozen
-   + LoRA adapters    r = 16, attention layers
+   + <b>LoRA</b> adapters    r = 16, attention projections
    |
    v
-linear score head --&gt; grammar score 0 to 5</pre></div>
+middle layer: mean of audio tokens + last position
+   |
+   v
+<b>linear head</b> --&gt; grammar score 0 to 5</pre></div>
           </li>
           <li class="proj">
             <div>
@@ -537,7 +563,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
                 <dt>Limit</dt><dd>Only the fully connected head is gated. It holds 89% of the parameters, and the convolutional layers are left unpruned to keep features stable.</dd>
               </dl>
             </div>
-            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline diagram"><pre aria-hidden="true">effective w = w  x  sigmoid(g)      g is learned
+            <div class="pipe fit" tabindex="0" role="img" aria-label="Pipeline: each weight is multiplied by the sigmoid of a learned gate score, the loss adds lambda times the sum of the gates to cross-entropy, so unhelpful weights switch off and a sparse classifier head remains."><pre aria-hidden="true">effective w = w  x  sigmoid(g)      g is learned
                       |
    loss = cross-entropy + lambda x sum(gates)
                       |
@@ -645,11 +671,11 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
           <li>Rounding to the 0.5 label grid</li>
           <li>Stretching the short clips' predictions</li>
           <li>An LLM judge, Qwen3-8B, reading transcripts</li>
-          <li>End-to-end fine-tuning of DeBERTa and WavLM</li>
-          <li>Grammar-error features: T5, CoLA, GPT-2</li>
+          <li>QLoRA fine-tuning of Voxtral</li>
+          <li>Grammar-error features: T5 edit rate, CoLA</li>
           <li>LanguageTool error counts</li>
           <li>Test-time augmentation over shifted windows</li>
-          <li>Voxtral's upper layers</li>
+          <li>A 24B audio model instead of the 3B</li>
         </ul>
       </div>
     </section>
@@ -854,8 +880,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
       p[k] = c[0]; p[k + 1] = c[1]; p[k + 2] = c[2]; p[k + 3] = alpha[n];
     }
     clean = d;
-    ctx.clearRect(0, 0, cvs.width, cvs.height);
-    ctx.putImageData(clean, 0, 0);
+    blit(clean);
     artBox.classList.add("live");
   }
   function sample() {
@@ -885,21 +910,159 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
           }
         }
       }
-      ctx.putImageData(frameData, 0, 0);
+      blit(frameData);
       tOut.textContent = "t = " + step;
       if (step-- > 0) { requestAnimationFrame(frame); return; }
-      ctx.putImageData(clean, 0, 0);
+      blit(clean);
       artBox.classList.remove("noise");
       tOut.textContent = "t = 0";
     }
     requestAnimationFrame(frame);
   }
+  /* ---------- the hands react: heat under the pointer, a pulse on tap, fingers close in on scroll ---------- */
+  var SPLIT = 379, GOD = [423, 204], BW = 2, BH = 3;      // the fingertip gap, God's fingertip, one character cell
+  var COLS = 368, ROWS = 138, heat = new Float32Array(COLS * ROWS), ink2 = null;
+  var drift = 0, pulse = -1, looping = false, buf = null, fxRnd = rng(7);
+  var spark = artBox.querySelector(".spark");
+  var GOLD = { dark: [217, 178, 111], light: [134, 92, 26] };
+  function blit(data) {
+    // left of the gap moves right by drift, right of it moves left: Adam and God reach for each other
+    if (!drift) { ctx.putImageData(data, 0, 0); return; }
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+    ctx.putImageData(data, drift, 0, 0, 0, SPLIT, cvs.height);
+    ctx.putImageData(data, -drift, 0, SPLIT, 0, cvs.width - SPLIT, cvs.height);
+  }
+  function inkCells() {
+    // which character cells hold ink, so the scramble stays on the hands and off the black
+    ink2 = new Uint8Array(COLS * ROWS);
+    for (var r = 0; r < ROWS; r++) for (var c = 0; c < COLS; c++) {
+      var m = 0;
+      for (var y = r * BH; y < r * BH + BH; y++) for (var x = c * BW; x < c * BW + BW; x++) m = Math.max(m, alpha[y * cvs.width + x]);
+      ink2[r * COLS + c] = m > 24 ? 1 : 0;
+    }
+  }
+  function warm(px, py, radius, amount) {
+    var c0 = Math.max(0, ((px - radius) / BW) | 0), c1 = Math.min(COLS - 1, ((px + radius) / BW) | 0);
+    var r0 = Math.max(0, ((py - radius) / BH) | 0), r1 = Math.min(ROWS - 1, ((py + radius) / BH) | 0);
+    for (var r = r0; r <= r1; r++) for (var c = c0; c <= c1; c++) {
+      var dx = c * BW - px, dy = r * BH - py, f = 1 - (dx * dx + dy * dy) / (radius * radius);
+      if (f > 0) { var k = r * COLS + c; heat[k] = Math.min(1, heat[k] + amount * f); }
+    }
+  }
+  function paintHeat() {
+    looping = false;
+    if (!clean || artBox.classList.contains("noise")) return;   // the sampler owns the canvas while it runs
+    var w = cvs.width, src = clean.data, out, hot = false, gold = GOLD[ink() === INK.light ? "light" : "dark"];
+    if (!buf) buf = ctx.createImageData(w, cvs.height);
+    out = buf.data; out.set(src);
+    if (pulse >= 0) {
+      // a ring of heat leaves God's fingertip and runs through both hands
+      for (var r = 0; r < ROWS; r++) for (var c = 0; c < COLS; c++) {
+        var dx = c * BW - GOD[0], dy = r * BH - GOD[1], d = Math.sqrt(dx * dx + dy * dy) - pulse;
+        if (d > -26 && d < 0) { var k = r * COLS + c; heat[k] = Math.max(heat[k], .8 * (1 + d / 26)); }
+      }
+      pulse = pulse > 820 ? -1 : pulse + 14;
+    }
+    for (var k = 0; k < heat.length; k++) {
+      var hk = heat[k];
+      if (hk < .02) { heat[k] = 0; continue; }
+      hot = true; heat[k] = hk * .9;
+      if (!ink2[k] || fxRnd() > hk) continue;
+      // a hot cell flickers in gold: the characters there are re-noised, then cool back to the clean picture
+      var cr = (k / COLS) | 0, cc = k - cr * COLS, a = 90 + fxRnd() * 165 * hk;
+      for (var y = 0; y < BH; y++) for (var x = 0; x < BW; x++) {
+        var o = ((cr * BH + y) * w + cc * BW + x) * 4;
+        out[o] = gold[0]; out[o + 1] = gold[1]; out[o + 2] = gold[2]; out[o + 3] = a;
+      }
+    }
+    blit(buf);
+    if (hot || pulse >= 0) loop();
+  }
+  function loop() { if (!looping) { looping = true; requestAnimationFrame(paintHeat); } }
+  function toCanvas(e) {
+    var r = artBox.querySelector(".stage").getBoundingClientRect();
+    return [(e.clientX - r.left) / r.width * cvs.width, (e.clientY - r.top) / r.height * cvs.height];
+  }
+  function interactive() {
+    if (reduce) return;
+    inkCells();
+    artBox.addEventListener("pointermove", function (e) {
+      var q = toCanvas(e), dx = q[0] - SPLIT, dy = q[1] - 210;
+      artBox.style.setProperty("--near", Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy) / 140).toFixed(2));
+      warm(q[0], q[1], 26, .55); loop();
+    });
+    artBox.addEventListener("pointerleave", function () { artBox.style.setProperty("--near", 0); });
+    artBox.addEventListener("pointerdown", function (e) {
+      var q = toCanvas(e);
+      warm(q[0], q[1], 34, .9); pulse = 0; loop();
+      spark.classList.remove("fire"); void spark.offsetWidth; spark.classList.add("fire");
+    });
+    var hero = document.querySelector(".hero");
+    window.addEventListener("scroll", function () {
+      var p = Math.min(1, Math.max(0, window.scrollY / Math.max(1, hero.offsetHeight * .6)));
+      var d = Math.round(p * 18);
+      if (d !== drift) { drift = d; artBox.style.setProperty("--near", (p * .8).toFixed(2)); loop(); }
+    }, { passive: true });
+  }
   function start() {
     if (!ctx) return;
     try { prepare(); } catch (err) { return; }      // a canvas that cannot be read keeps the plain image
+    interactive();
     sample();
   }
   if (img.complete && img.naturalWidth) start(); else img.addEventListener("load", start);
+
+  /* ---------- pipelines: a gold packet runs each diagram, input to output ---------- */
+  var pipes = [];
+  [].forEach.call(document.querySelectorAll(".pipe pre"), function (pre) {
+    var walker = document.createTreeWalker(pre, NodeFilter.SHOW_TEXT), nodes = [], line = 0;
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(function (node) {
+      if (node.parentNode !== pre) { node.parentNode.setAttribute("data-l", line); return; }   // a labelled step
+      var t = node.nodeValue, frag = document.createDocumentFragment(), plain = "", i = 0;
+      while (i < t.length) {
+        var j = i;
+        while (j < t.length && "-|+>v".indexOf(t[j]) >= 0) j++;
+        // a run of arrow characters with no letters touching it is part of the flow ("4-bit" is not)
+        if (j > i && !/\w/.test(t[i - 1] || "") && !/\w/.test(t[j] || "")) {
+          if (plain) { frag.appendChild(document.createTextNode(plain)); plain = ""; }
+          var sp = document.createElement("span");
+          sp.className = "f"; sp.setAttribute("data-l", line); sp.textContent = t.slice(i, j);
+          frag.appendChild(sp); i = j; continue;
+        }
+        j = Math.max(j, i + 1);
+        for (var c = i; c < j; c++) if (t[c] === "\n") line++;
+        plain += t.slice(i, j); i = j;
+      }
+      if (plain) frag.appendChild(document.createTextNode(plain));
+      pre.replaceChild(frag, node);
+    });
+    var rows = [];
+    [].forEach.call(pre.querySelectorAll("[data-l]"), function (el) { var l = +el.getAttribute("data-l"); (rows[l] = rows[l] || []).push(el); });
+    var item = { rows: rows, step: 0, seen: false };
+    pipes.push(item);
+    function lit(l, on) { (rows[l] || []).forEach(function (el) { el.classList.toggle("lit", on); }); }
+    pre.addEventListener("pointerover", function (e) {
+      var el = e.target.closest && e.target.closest("[data-l]");
+      if (!el) return;
+      pre.querySelectorAll(".lit").forEach(function (x) { x.classList.remove("lit"); });
+      pre.classList.add("focus"); lit(+el.getAttribute("data-l"), true);
+    });
+    pre.addEventListener("pointerleave", function () {
+      pre.classList.remove("focus");
+      pre.querySelectorAll(".lit").forEach(function (x) { x.classList.remove("lit"); });
+    });
+    if ("IntersectionObserver" in window) new IntersectionObserver(function (es) { item.seen = es[0].isIntersecting; }).observe(pre);
+  });
+  if (!reduce) setInterval(function () {
+    pipes.forEach(function (p) {
+      if (!p.seen || document.hidden) return;
+      var n = p.rows.length + 5;                       // the packet pauses a beat at the output
+      (p.rows[(p.step + n - 1) % n] || []).forEach(function (el) { el.classList.remove("on"); });
+      (p.rows[p.step] || []).forEach(function (el) { el.classList.add("on"); });
+      p.step = (p.step + 1) % n;
+    });
+  }, 200);
 
   /* ---------- theme: charcoal or warm stone, remembered per visitor ---------- */
   var themeBtn = document.getElementById("theme-btn"), themeLabel = document.getElementById("theme-label");
@@ -914,7 +1077,7 @@ linear score head --&gt; grammar score 0 to 5</pre></div>
     document.documentElement.setAttribute("data-theme", next);
     try { localStorage.setItem("theme", next); } catch (err) {}
     showTheme();
-    if (clean) { try { running++; prepare(); artBox.classList.remove("noise"); tOut.textContent = "t = 0"; } catch (err) {} }
+    if (clean) { try { running++; artBox.classList.remove("noise"); prepare(); tOut.textContent = "t = 0"; } catch (err) {} }
   });
   document.getElementById("resample").addEventListener("click", function () {
     if (reduce) { toast("Animation is off because reduced motion is on"); return; }

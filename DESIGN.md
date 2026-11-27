@@ -68,6 +68,10 @@ from `--ink` on a canvas, so they work on both.
 - 150 to 250ms, easing `cubic-bezier(.22, 1, .36, 1)`. Animate `transform`, `opacity` and colour only.
 - Buttons lift 2px on hover and press to `scale(.97)`. Project rows slide 10px on hover.
 - One orchestrated moment: the hands denoise from noise in 40 steps on load.
+- The hands answer the visitor: the pointer leaves a gold trail of re-noised characters that cools back, a tap sends a
+  pulse out from God's fingertip through both hands, and scrolling draws the two fingertips closer.
+- Each project pipeline runs a gold packet from input to output, row by row, only while it is on screen. Hovering a
+  labelled step traces its row and dims the rest. Every diagram also has a full text description for screen readers.
 - A 2px reading-progress bar driven by a CSS scroll timeline (no JavaScript).
 - The sticky header uses a layered progressive blur instead of a hard edge.
 - `prefers-reduced-motion: reduce` turns every transition and animation off.

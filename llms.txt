@@ -15,7 +15,7 @@ Resume: AryanAwasthi.pdf
 ## Projects
 
 - [CollegeBot](https://github.com/Techy-A/collegebot-rag): grounded RAG assistant with cited answers and explicit refusals. Hybrid dense and BM25 retrieval raised facts reaching the context from 77.1% to 88.6%, matching a cross-encoder reranker with no added latency. 64 offline tests.
-- [Spoken grammar scoring](https://github.com/Techy-A/shl-grammar-scoring): predicts a 0 to 5 grammar score from spontaneous speech using verbatim Whisper transcripts, frozen speech encoders and an audio language model. Out-of-fold Pearson r of 0.909 on speaker-grouped folds.
+- [Spoken grammar scoring](https://github.com/Techy-A/shl-grammar-scoring): predicts a 0 to 5 grammar score from spontaneous speech using verbatim Whisper transcripts, speech encoder embeddings and an audio language model with an attention-pooling head, in a non-negative blend. Out-of-fold Pearson r of 0.915 and RMSE 0.500 on speaker-grouped folds.
 - [Text-to-image evaluation arena](https://github.com/Techy-A/IMAGE-LLP-VISION): round-robin tournaments within prompt groups, five scorers, Elo and Bradley-Terry MLE rankings, runs locally.
 - [Audio LLM grammar scorer](https://github.com/Techy-A/LORA_for_GPU): QLoRA fine-tuning of Voxtral-Mini-3B on an 8 GB GPU with speaker-grouped 5-fold cross-validation.
 - [Self-pruning neural network](https://github.com/Techy-A/Self-Pruning-Neural-Network---Tredence-Analytics): CIFAR-10 network whose classifier head prunes itself with L1-penalised sigmoid gates.
