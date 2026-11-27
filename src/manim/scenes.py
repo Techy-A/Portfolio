@@ -1,15 +1,16 @@
-"""Manim scenes for the Method section (Fig. 3 and Fig. 4).
+"""Manim scenes: Fig. 3 to Fig. 6 in the Method section and one per project card.
 
-What: two short explanatory animations, rendered once and committed as video in media/.
+What: short explanatory animations, rendered once and committed as video in media/.
   FoldLeak   - random folds put a speaker's twin clip on both sides of a fold; speaker-grouped folds do not.
   GatePush   - an unimportant pruning gate under the L1 and the L2 penalty alone: L1 crosses the 0.01
                pruning threshold, L2's push fades as the gate nears zero (gradients from the project README).
-Why: these two decisions are mathematical and had no figure; an animation shows the mechanism, not just the verdict.
+  Rrf, Arena, Listen, Lora, Prune - one idea per project card; Judge, Chain - Fig. 5 and Fig. 6.
+Why: these decisions had no figure; an animation shows the mechanism, not just the verdict.
 Style: the site's palette on pure black (the page blends black away; the light theme inverts it), Space Mono text,
        no LaTeX so the render needs only Manim, Cairo, Pango and the Space Mono font.
 
 Usage (from the repo root, Manim Community 0.19+ and Space Mono installed):
-  python src/manim/render.py          # renders both scenes, then encodes media/*.mp4 and *.webp posters
+  python src/manim/render.py [name ...]   # renders the scenes (all by default), then encodes media/*.mp4 and *.webp posters
 """
 import numpy as np
 from manim import (Axes, Circle, Create, DashedLine, Dot, FadeIn, FadeOut, Line, Scene, Text, ValueTracker,
@@ -330,3 +331,103 @@ class Prune(Scene):
                        .arrange(DOWN, buff=.12).move_to([-4.6 + p * 4.6, -1.85, 0]) for p, (lam, done, sp, acc) in enumerate(runs)])
         self.play(FadeIn(res, lag_ratio=.3), epoch.animate.set_value(100), run_time=2.2, rate_func=linear)
         self.wait(3.2)
+
+
+class Judge(Scene):
+    """CollegeBot evaluation: the 8B writer is graded by a separate 70B judge, and the harness runs at temperature 0.0.
+    Refusal accuracy per round is the README table; rounds 3 and 5 ran the same setup (0.974 vs 0.872)."""
+
+    def construct(self):
+        from manim import Arrow, SurroundingRectangle
+        writer = label("writer  llama-3.1-8b-instant", 19, INK)
+        judge = label("judge  llama-3.3-70b-versatile", 19, SAGE, "BOLD")
+        temp = label("temperature 0.0", 19, SAGE)
+        writer.move_to([-6.75, 1.9, 0], aligned_edge=LEFT)
+        judge.move_to([-6.75, .1, 0], aligned_edge=LEFT)
+        temp.next_to(judge, DOWN, buff=.15).align_to(judge, LEFT)
+        boxes = VGroup(SurroundingRectangle(writer, color=INK3, buff=.18, stroke_width=2),
+                       SurroundingRectangle(VGroup(judge, temp), color=SAGE, buff=.18, stroke_width=2))
+        arrow = Arrow(boxes[0].get_bottom(), boxes[1].get_top(), color=INK3, buff=.08, stroke_width=3)
+        own = label("not the writer grading itself", 18, ROSE).next_to(boxes[1], DOWN, buff=.3).align_to(boxes[1], LEFT)
+        strike = Line(own.get_left(), own.get_right(), color=ROSE, stroke_width=2)
+        self.play(FadeIn(writer), Create(boxes[0]), run_time=.8)
+        self.play(Create(arrow), FadeIn(judge), FadeIn(temp), Create(boxes[1]), run_time=1.0)
+        self.play(FadeIn(own), run_time=.5)
+        self.wait(.6)
+
+        acc = [.923, .974, .974, .872, .872]
+        ax = Axes(x_range=[.5, 5.5, 1], y_range=[.85, 1.0, .05], x_length=5.6, y_length=4.2, tips=False,
+                  axis_config={"color": INK3, "stroke_width": 2}).move_to([3.7, -.25, 0])
+        yt = VGroup(*[label(f"{v:.2f}", 17).next_to(ax.c2p(.5, v), LEFT, buff=.15) for v in (.85, .90, .95, 1.0)])
+        xt = VGroup(*[label(f"{r}", 16).next_to(ax.c2p(r, .85), DOWN, buff=.15) for r in range(1, 6)],
+                    label("evaluation round", 16).next_to(ax, DOWN, buff=.5))
+        head = label("refusal accuracy per round", 19, INK).next_to(ax, UP, buff=.35).align_to(ax, LEFT)
+        target = DashedLine(ax.c2p(.5, .95), ax.c2p(5.5, .95), color=INK3, dash_length=.1)
+        tl = label("target 0.95", 16).next_to(ax.c2p(5.5, .95), UP, buff=.08).align_to(ax.c2p(5.5, .95), RIGHT)
+        self.play(Create(ax), FadeIn(yt), FadeIn(xt), FadeIn(head), Create(target), FadeIn(tl), run_time=1.1)
+        dots = VGroup()
+        for r, v in enumerate(acc, 1):
+            d = Dot(ax.c2p(r, v), radius=.09, color=GOLD if r in (3, 5) else INK)
+            dots.add(d)
+            self.play(FadeIn(d, scale=.5), FadeIn(label(f"{v:.3f}", 16, INK).next_to(d, UP, buff=.1)), run_time=.4)
+        gap = Line(ax.c2p(4.6, .974), ax.c2p(4.6, .872), color=GOLD, stroke_width=4)
+        ticks = VGroup(Line(ax.c2p(4.5, .974), ax.c2p(4.7, .974), color=GOLD, stroke_width=4),
+                       Line(ax.c2p(4.5, .872), ax.c2p(4.7, .872), color=GOLD, stroke_width=4))
+        link = DashedLine(ax.c2p(3, .974), ax.c2p(4.5, .974), color=GOLD, dash_length=.08, stroke_width=2)
+        same = label("rounds 3 and 5: same setup", 18, GOLD, "BOLD").next_to(own, DOWN, buff=.45).align_to(own, LEFT)
+        noise = label("noise at temperature 0.05: about 0.10", 18, GOLD).next_to(same, DOWN, buff=.1).align_to(same, LEFT)
+        self.play(Create(link), Create(gap), Create(ticks), FadeIn(same), run_time=1.0)
+        self.play(FadeIn(noise), run_time=.6)
+        fix = label("so the harness now runs at 0.0", 18, SAGE, "BOLD").next_to(noise, DOWN, buff=.3).align_to(own, LEFT)
+        self.play(Create(strike), FadeIn(fix), run_time=.8)
+        self.wait(3)
+
+
+class Chain(Scene):
+    """CollegeBot follow-up turn: the legacy chain rewrites the question with an extra LLM call before retrieval
+    (two sequential requests) and shows the answer in one block; the plain pipeline adds the previous question to the
+    search and streams one call. Durations are illustrative."""
+
+    def construct(self):
+        from manim import Rectangle
+        x0, unit, y1, y2 = -1.5, .6, 1.15, -1.05
+        X = lambda v: x0 + v * unit
+        def bar(t0, t1, y, colour, text, fill=.85, size=15):
+            r = Rectangle(width=(t1 - t0) * unit, height=.5, stroke_width=0, fill_color=colour, fill_opacity=fill)
+            r.move_to([X((t0 + t1) / 2), y, 0])
+            return VGroup(r, label(text, size, "#000000", "BOLD").move_to(r)) if text else r
+        n1 = VGroup(label("ConversationalRetrievalChain", 19, ROSE, "BOLD"), label("2 LLM requests per turn", 17, INK3),
+                    label("rewrites the question first", 17, INK3))
+        n2 = VGroup(label("retrieve, prompt, stream", 19, SAGE, "BOLD"), label("1 LLM request per turn", 17, INK3),
+                    label("search: previous + new question", 17, INK3))
+        for g, y in ((n1, y1), (n2, y2)):
+            g.arrange(DOWN, aligned_edge=LEFT, buff=.1).move_to([-6.8, y, 0], aligned_edge=LEFT)
+        q = label('a follow-up arrives: "and the hostel fee?"', 19, INK).move_to([-6.8, 3.0, 0], aligned_edge=LEFT)
+        axis = Line([X(0), -2.3, 0], [X(14), -2.3, 0], color=INK3, stroke_width=2)
+        al = label("time", 16).next_to(axis, DOWN, buff=.12).align_to(axis, RIGHT)
+        self.play(FadeIn(q), FadeIn(n1), FadeIn(n2), Create(axis), FadeIn(al), run_time=1.1)
+
+        t = ValueTracker(0)
+        cursor = always_redraw(lambda: Line([X(t.get_value()), 2.1, 0], [X(t.get_value()), -2.3, 0], color=GOLD,
+                                            stroke_width=2, stroke_opacity=.6))
+        # the streamed answer fills in as it is generated
+        grow = always_redraw(lambda: Rectangle(width=max(min(t.get_value(), 9.5) - 1.5, .001) * unit, height=.5, stroke_width=0,
+                                               fill_color=GOLD, fill_opacity=.85 if t.get_value() > 1.5 else 0)
+                             .move_to([X(1.5), y2, 0], aligned_edge=LEFT))
+        self.add(cursor, grow)
+        rewrite, s1 = bar(0, 4, y1, ROSE, "LLM: rewrite"), bar(4, 5.5, y1, INK3, "search", size=14)
+        s2 = bar(0, 1.5, y2, INK3, "search", size=14)
+        wait = Rectangle(width=8 * unit, height=.5, stroke_color=ROSE, stroke_width=2, fill_opacity=0).move_to([X(9.5), y1, 0])
+        answer1 = bar(5.5, 13.5, y1, ROSE, "LLM: answer")
+        answer2 = label("LLM: answer, streamed", 15, "#000000", "BOLD").move_to([X(5.5), y2, 0])
+        first = VGroup(Line([X(1.5), y2 - .3, 0], [X(1.5), y2 - .55, 0], color=SAGE, stroke_width=3),
+                       label("first words on screen", 16, SAGE).move_to([X(1.5), y2 - .75, 0], aligned_edge=LEFT))
+        self.play(t.animate.set_value(1.5), FadeIn(rewrite), FadeIn(s2), run_time=1.0, rate_func=linear)
+        self.play(FadeIn(first), FadeIn(answer2), t.animate.set_value(4), run_time=1.4, rate_func=linear)
+        self.play(FadeIn(s1), t.animate.set_value(5.5), run_time=.8, rate_func=linear)
+        self.play(Create(wait), t.animate.set_value(13.5), run_time=4.2, rate_func=linear)
+        done = label("whole answer at once", 16, ROSE).move_to([X(13.5), y1 - .55, 0], aligned_edge=RIGHT)
+        self.play(FadeIn(answer1), FadeIn(done), run_time=.5)
+        note = label("Groq free tier: 6,000 tokens per minute, shared by every visitor", 16, INK3).move_to([-6.8, -3.05, 0], aligned_edge=LEFT)
+        self.play(FadeIn(note), run_time=.5)
+        self.wait(3)

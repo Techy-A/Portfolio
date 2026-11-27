@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCENES = {"FoldLeak": "folds", "GatePush": "gates", "Rrf": "rrf", "Arena": "arena", "Listen": "listen",
-          "Lora": "lora", "Prune": "prune"}
+          "Lora": "lora", "Prune": "prune", "Judge": "judge", "Chain": "chain"}
 ONLY = set(sys.argv[1:])            # optional: render only these output names, e.g. rrf arena
 
 

@@ -711,6 +711,14 @@ middle layer: mean of audio tokens + last position
 
           <li class="dec">
             <p class="dq">Who grades the chatbot's answers?<span class="src">CollegeBot</span></p>
+            <figure>
+              <div class="plate">
+                <video class="anim" width="1280" height="640" muted loop playsinline preload="none" poster="media/judge.webp" aria-hidden="true">
+                  <source src="media/judge.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption><b>Fig. 5</b>  Refusal accuracy over five evaluation rounds, from the CollegeBot README. Rounds 3 and 5 ran the same setup and scored 0.974 and 0.872, so run-to-run noise at temperature 0.05 is about 0.10, larger than some of the changes being measured. Animated with Manim.</figcaption>
+            </figure>
             <ul class="opts" aria-label="Options compared">
               <li>The same 8B model that wrote the answer</li>
               <li class="pick">A stronger 70B judge, at temperature 0.0</li>
@@ -720,6 +728,14 @@ middle layer: mean of audio tokens + last position
 
           <li class="dec">
             <p class="dq">A ready-made conversation chain, or a plain pipeline?<span class="src">CollegeBot</span></p>
+            <figure>
+              <div class="plate">
+                <video class="anim" width="1280" height="640" muted loop playsinline preload="none" poster="media/chain.webp" aria-hidden="true">
+                  <source src="media/chain.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption><b>Fig. 6</b>  One follow-up question, two designs. The chain spends an extra model call rewriting the question before it can search, then returns the answer in one block; the plain pipeline searches straight away and streams. Durations are illustrative. Animated with Manim.</figcaption>
+            </figure>
             <ul class="opts" aria-label="Options compared">
               <li>LangChain ConversationalRetrievalChain</li>
               <li class="pick">Retrieve, build the prompt, stream</li>
@@ -1126,7 +1142,7 @@ middle layer: mean of audio tokens + last position
     });
   }, 200);
 
-  /* ---------- Manim clips (projects, Fig. 3 and 4): play at 1.2x only while on screen; reduced motion keeps the final frame ---------- */
+  /* ---------- Manim clips (projects, Fig. 3 to 6): play at 1.2x only while on screen; reduced motion keeps the final frame ---------- */
   if (!reduce && "IntersectionObserver" in window) {
     var vio = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
