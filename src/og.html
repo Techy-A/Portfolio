@@ -5,28 +5,27 @@
 <style>
 @font-face { font-family: "Clash Display"; src: url("../fonts/ClashDisplay-500.woff2") format("woff2"); font-weight: 500; }
 html, body { margin: 0; }
-body { width: 1200px; height: 627px; box-sizing: border-box; padding: 52px 64px 44px; background: #0F1013; color: #ECE9E3;
-  display: grid; grid-template-columns: 1fr 300px; grid-template-rows: auto 1fr auto; column-gap: 56px; overflow: hidden;
+body { width: 1200px; height: 627px; position: relative; overflow: hidden; background: #0F1013; color: #ECE9E3; text-align: center;
   font-family: "Bricolage Grotesque", sans-serif; }
-.tag { grid-column: 1; margin: 0; font: 15px "Space Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: #B0ACA4; display: flex; align-items: center; gap: 10px; }
-.tag i { width: 9px; height: 9px; border-radius: 50%; background: #9DC4AF; }
-.name { grid-column: 1; margin: 22px 0 0; font: 500 98px/0.95 "Clash Display", sans-serif; letter-spacing: -.025em; word-spacing: .06em; }
-.lead { grid-column: 1; align-self: end; margin: 0; font: 31px "Space Mono", monospace; letter-spacing: -.03em; color: #ECE9E3; }
+/* the hero, as on the site: the hands, then the name, then the line */
+.art { position: absolute; left: 150px; top: 6px; width: 900px; height: 367px; overflow: hidden; background: #0F1013;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 86%, transparent 100%); }
+.art img { position: absolute; left: 0; top: -56px; width: 900px; mix-blend-mode: lighten; filter: contrast(1.08) brightness(1.06); }
+.spark { position: absolute; left: 613px; top: 207px; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: #D9B26F;
+  box-shadow: 0 0 18px 6px rgba(217, 178, 111, .55), 0 0 60px 18px rgba(217, 178, 111, .18); }
+.name { position: absolute; left: 0; right: 0; top: 352px; margin: 0; font: 500 104px/1 "Clash Display", sans-serif; letter-spacing: -.025em; word-spacing: .06em; }
+.lead { position: absolute; left: 0; right: 0; top: 476px; margin: 0; font: 36px "Space Mono", monospace; letter-spacing: -.03em; }
 .lead code { font: inherit; }
-.lim { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; margin-right: .15em; }
+.lim { display: inline-flex; flex-direction: column; align-items: center; line-height: 1; margin-right: .15em; vertical-align: top; }
 .lim sub { font-size: .42em; color: #8A867E; margin-top: .25em; }
 .lead em { font-style: normal; color: #D9B26F; }
-.sub { grid-column: 1; margin: 14px 0 0; font-size: 21px; color: #B0ACA4; }
-.photo { grid-column: 2; grid-row: 1 / 4; position: relative; align-self: center; width: 300px; height: 300px; border-radius: 8px; overflow: hidden; box-shadow: 0 0 0 1px rgba(236,233,227,.12); }
-.photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.06); }
-.photo::after { content: ""; position: absolute; inset: 0; background: #D9B26F; mix-blend-mode: color; opacity: .22; }
-.hands { position: absolute; left: 30px; bottom: 150px; width: 760px; opacity: .22; mix-blend-mode: lighten;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 15%, #000 85%, transparent); }
+.foot { position: absolute; left: 0; right: 0; bottom: 34px; margin: 0; font: 19px "Space Mono", monospace; color: #B0ACA4; letter-spacing: .02em; }
+.foot i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #9DC4AF; margin-right: 10px; vertical-align: 2px; }
+.foot b { font-weight: 400; color: #ECE9E3; }
 </style></head><body>
-<img class="hands" src="../adam.jpg" alt="">
-<p class="tag"><i></i>Open to ML and data roles</p>
-<div><p class="name">Aryan<br>Awasthi</p></div>
-<div style="grid-column:1;align-self:end"><p class="lead"><span class="lim">lim<sub>n&nbsp;&rarr;&nbsp;&infin;</sub></span><code> effort(n) = <em>still going</em></code></p>
-<p class="sub">ML and model evaluation. Thapar Institute, 2027.</p></div>
-<div class="photo"><img src="../portrait-480.jpg" alt=""></div>
+<div class="art"><img src="../adam.jpg" alt=""></div>
+<span class="spark"></span>
+<p class="name">Aryan Awasthi</p>
+<p class="lead"><span class="lim">lim<sub>n&nbsp;&rarr;&nbsp;&infin;</sub></span><code> effort(n) = <em>still going</em></code></p>
+<p class="foot"><i></i>Open to ML and data roles &nbsp;/&nbsp; <b>aryanawasthi.vercel.app</b></p>
 </body></html>
