@@ -33,6 +33,8 @@ A single static page with no framework and no build step at runtime.
 | `AryanAwasthi.pdf` | Resume, linked from the page. |
 | `portrait-*.jpg/.webp` | Portrait for the About section, 480 and 960 px. |
 | `fonts/` | Clash Display (Fontshare, ITF Free Font License), self-hosted. |
+| `src/manim/` | [Manim](https://www.manim.community/) scenes (MIT) for Fig. 3 and Fig. 4 in the Method section, and the script that renders them. |
+| `media/` | The rendered clips (`.mp4`) and their last frames (`.webp`, the poster and the reduced-motion still). |
 
 ## Editing
 
@@ -45,6 +47,9 @@ npm ci && npm test          # Playwright: phone and desktop, both themes, axe ac
 ```
 
 To redo the link preview, run `python3 src/og.py` and screenshot `src/og.html` at 1200 x 627 as `og.png`.
+
+To redo the Method animations, install Manim Community and the Space Mono font, then run `python src/manim/render.py`.
+The videos are committed, so building and testing the site never needs Manim.
 
 ## Pipeline
 

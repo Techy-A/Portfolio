@@ -300,6 +300,10 @@ kbd { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
 /* method */
 figure { margin: 22px 0; }
 .plate { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 22px 0 18px; }
+/* Manim renders on black: lighten drops the black on charcoal; the light theme inverts it and darken drops the white */
+.plate:has(> .anim) { background: var(--bg); }     /* the backdrop the blend works against */
+.anim { display: block; width: 100%; height: auto; mix-blend-mode: lighten; }
+:root[data-theme="light"] .anim { filter: invert(1) hue-rotate(180deg); mix-blend-mode: darken; }
 .sec figcaption { font: 12px/1.6 var(--mono); color: var(--ink-3); margin: 12px 0 0; max-width: 70ch; }
 .sec figcaption b { color: var(--accent); font-weight: 400; }
 .diff { display: grid; grid-template-columns: max-content minmax(0, max-content); gap: 6px 18px; font-family: var(--mono); font-size: 14px; margin: 18px 0 0; }
@@ -631,6 +635,14 @@ middle layer: mean of audio tokens + last position
 
           <li class="dec">
             <p class="dq">Random folds or speaker-grouped folds?<span class="src">Spoken grammar scoring</span></p>
+            <figure>
+              <div class="plate">
+                <video class="anim" width="1280" height="640" muted loop playsinline preload="none" poster="media/folds.webp" aria-hidden="true">
+                  <source src="media/folds.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption><b>Fig. 3</b>  Illustrative. Clips sit where a speaker model places them, so a speaker's two clips land close together. Random folds put a validation clip's twin in training, and the score partly rewards recognising the voice. Grouping by speaker keeps both clips on one side. Animated with Manim.</figcaption>
+            </figure>
             <ul class="opts" aria-label="Options compared">
               <li>Random cross-validation folds</li>
               <li class="pick">Folds grouped by speaker</li>
@@ -640,6 +652,14 @@ middle layer: mean of audio tokens + last position
 
           <li class="dec">
             <p class="dq">L1 or L2 penalty on the pruning gates?<span class="src">Self-pruning network</span></p>
+            <figure>
+              <div class="plate">
+                <video class="anim" width="1280" height="640" muted loop playsinline preload="none" poster="media/gates.webp" aria-hidden="true">
+                  <source src="media/gates.mp4" type="video/mp4">
+                </video>
+              </div>
+              <figcaption><b>Fig. 4</b>  An unimportant gate g = sigmoid(s) pushed by the penalty alone, with the same step size. The push on s is g(1&minus;g) under L1 and 2g&sup2;(1&minus;g) under L2, so the L2 push dies first as the gate nears zero. L1 crosses the 0.01 pruning threshold; L2 stalls above it. Animated with Manim.</figcaption>
+            </figure>
             <ul class="opts" aria-label="Options compared">
               <li>L2 penalty on gate values</li>
               <li class="pick">L1 penalty on gate values, weight decay removed from the gates</li>
@@ -1063,6 +1083,18 @@ middle layer: mean of audio tokens + last position
       p.step = (p.step + 1) % n;
     });
   }, 200);
+
+  /* ---------- Fig. 3 and 4: the Manim clips play only while on screen; reduced motion keeps the final frame ---------- */
+  if (!reduce && "IntersectionObserver" in window) {
+    var vio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) { e.target.pause(); return; }
+        var pr = e.target.play();
+        if (pr && pr.catch) pr.catch(function () {});     // autoplay refused: the poster still tells the story
+      });
+    }, { threshold: .4 });
+    document.querySelectorAll("video.anim").forEach(function (v) { vio.observe(v); });
+  }
 
   /* ---------- theme: charcoal or warm stone, remembered per visitor ---------- */
   var themeBtn = document.getElementById("theme-btn"), themeLabel = document.getElementById("theme-label");

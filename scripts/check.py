@@ -32,7 +32,7 @@ for p in TEXT:
 
 # 3. local references resolve
 page = (ROOT / "index.html").read_text(encoding="utf-8")
-for ref in sorted(set(re.findall(r'(?:src|href|srcset)="([^"#:]+?)(?:\s+\d+w)?"', page))):
+for ref in sorted(set(re.findall(r'(?:src|href|srcset|poster)="([^"#:]+?)(?:\s+\d+w)?"', page))):
     for part in ref.split(","):
         path = part.strip().split(" ")[0]
         if path and not path.startswith(("/", "{")) and not (ROOT / path).exists():
